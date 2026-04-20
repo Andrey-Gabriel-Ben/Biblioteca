@@ -26,27 +26,30 @@ public abstract class Usuario {
             System.out.print("Digite o nome do usuario: ");
             String nomeImput = scanner.nextLine();
             validarEntrada(nomeImput);
-            this.nome = nomeImput;
+            setNome(nomeImput);
 
             // cpf
             System.out.print("Digite o CPF do usuario: ");
             String cpfimput = scanner.nextLine();
             validarCpf(cpfimput);
             cpfimput = apenasNumeros(cpfimput);
-            this.cpf = cpfimput;
+            setCpf(cpfimput);
 
             // E-mail
             System.out.print("Digite o E-mail do usuario: ");
             String emailImput = scanner.nextLine();
             validarEntrada(emailImput);
-            this.email = emailImput;
+            setEmail(emailImput);
 
             // Telefone
             System.out.println("Digite o telefone do usuario contendo DDI, DDD e 9 dígitos.");
             String telefoneImput = scanner.nextLine();
             VerificarTelefone(telefoneImput);
             telefoneImput = apenasNumeros(telefoneImput);
-            this.telefone = telefoneImput;
+            setTelefone(telefoneImput);
+
+            //tipo
+            setTipo(getTipo());
 
             this.sendUserToDatabase();
 
@@ -174,6 +177,31 @@ public abstract class Usuario {
         if (!resultado) {
             ErroDeCriação("cpf inválido!");
         }
+    }
+
+    public void setId_Usuario(int id_Usuario) {
+        this.id_Usuario = id_Usuario;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public int getId_Usuario() {
