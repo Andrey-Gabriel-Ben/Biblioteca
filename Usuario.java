@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public /* abstract */ class Usuario {
+ public class Usuario {
     int id_Usuario;
     String nome;
     String cpf;
@@ -8,7 +8,7 @@ public /* abstract */ class Usuario {
     String telefone; // fazer tratamento
 
 
-    public Usuario() {
+    protected  Usuario() {
 
         try (Scanner scanner = new Scanner(System.in)){
             // nome
@@ -26,7 +26,7 @@ public /* abstract */ class Usuario {
             // E-mail
             System.out.print("Digite o E-mail do usuario: ");
             String emailImput = scanner.next();
-            validarEntrada(nomeImput);
+            validarEntrada(emailImput);
             this.email = emailImput;
 
             // Telefone
@@ -38,6 +38,7 @@ public /* abstract */ class Usuario {
             this.telefone = telefoneFormatado;
 
             // id do usuario
+
         } catch (Exception e) {
             System.out.println("Devido ao erro, usuario não foi criado, por favor tente novamente\n");
         }
@@ -50,12 +51,11 @@ public /* abstract */ class Usuario {
         }
     }
 
-
-    private void ErroDeCriação (String msg){
+    protected void ErroDeCriação (String msg){
         throw new IllegalArgumentException(msg);
     }
 
-    private boolean VerificarTelefone(String telefone){
+    protected boolean VerificarTelefone(String telefone){
         // Limpeza:
         String apenasNumeros = telefone.replaceAll("[^0-9]", "");
 
@@ -66,7 +66,7 @@ public /* abstract */ class Usuario {
         }
     }
 
-    private String formatarTelefone(String telefone) {
+    protected String formatarTelefone(String telefone) {
         // Limpeza:
         String apenasNumeros = telefone.replaceAll("[^0-9]", "");
 
@@ -74,7 +74,7 @@ public /* abstract */ class Usuario {
         return formatado;
     }
 
-    private void validarCpf(String cpfSujo) {
+    protected void validarCpf(String cpfSujo) {
         boolean resultado;
 
         // Calculo:
@@ -148,15 +148,21 @@ public /* abstract */ class Usuario {
         return this.telefone;
     }
 
+    
+    protected double calcularMulta(){
+        return 0.0;
+    }
+
+
     public static void main(String[] args) {
         Usuario teste = new Usuario();
-/*
+
         System.out.println(teste.getId_Usuario());
         System.out.println(teste.getNome());
         System.out.println(teste.getCpf());
         System.out.println(teste.getEmail());
         System.out.println(teste.getTelefone());
-*/
+
 
         System.out.println("and it is begin");
     }
