@@ -1,76 +1,122 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Scanner;
 
- public class Usuario {
-    int id_Usuario;
-    String nome;
-    String cpf;
-    String email; // unique
-    String telefone; // fazer tratamento
+public abstract class Usuario {
+    protected int id_Usuario;
+    protected String nome;
+    protected String cpf;
+    protected String email; 
+    protected String telefone; 
+    protected String tipo;
 
+    protected Usuario(int id_Usuario, String nome, String cpf, String email, String telefone) {
+        this.id_Usuario = id_Usuario;
+        this.nome = nome;
+        this.cpf = cpf;
+        this.email = email;
+        this.telefone = telefone;
+    }
+    // reescrever nas subclasses com tipo e puxar dadsos do banco
 
-    protected  Usuario() {
-
-        try (Scanner scanner = new Scanner(System.in)){
+    public void cadastrarUsuario () {
+        try (Scanner scanner = new Scanner(System.in)) {
             // nome
             System.out.print("Digite o nome do usuario: ");
-            String nomeImput = scanner.next();
+            String nomeImput = scanner.nextLine();
             validarEntrada(nomeImput);
             this.nome = nomeImput;
 
             // cpf
             System.out.print("Digite o CPF do usuario: ");
-            String cpfimput = scanner.next();
+            String cpfimput = scanner.nextLine();
             validarCpf(cpfimput);
+            cpfimput = apenasNumeros(cpfimput);
             this.cpf = cpfimput;
 
             // E-mail
             System.out.print("Digite o E-mail do usuario: ");
-            String emailImput = scanner.next();
+            String emailImput = scanner.nextLine();
             validarEntrada(emailImput);
             this.email = emailImput;
 
             // Telefone
             System.out.println("Digite o telefone do usuario contendo DDI, DDD e 9 dígitos.");
-            scanner.nextLine();
             String telefoneImput = scanner.nextLine();
             VerificarTelefone(telefoneImput);
-            String telefoneFormatado = formatarTelefone(telefoneImput);
-            this.telefone = telefoneFormatado;
+            telefoneImput = apenasNumeros(telefoneImput);
+            this.telefone = telefoneImput;
 
-            // id do usuario
+            this.sendUserToDatabase();
 
         } catch (Exception e) {
             System.out.println("Devido ao erro, usuario não foi criado, por favor tente novamente\n");
         }
-        
-    }
 
-    public static void validarEntrada(String entrada) throws Exception {
+
+    }
+    //adicionar verificação para evitar usuarios repetidos
+
+    protected void sendUserToDatabase() {
+        String insert = "INSERT INTO usuarios (nome, cpf, email, telefone, tipo) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = ConexaoBanco.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(insert)) {
+
+            stmt.setString(1, this.getNome());
+            stmt.setString(2, this.getCpf());
+            stmt.setString(3, this.getEmail());
+            stmt.setString(4, this.getTelefone());
+            stmt.setString(5, this.getTipo());
+
+            stmt.execute();
+
+            System.out.println("Usuário " + this.getNome() + " enviado para o banco!");
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao salvar no banco: " + e.getMessage());
+        }
+    }
+    
+
+    protected static void validarEntrada(String entrada) throws Exception {
         if (entrada == null || entrada.trim().isEmpty()) {
             throw new Exception("O campo não pode estar vazio!");
         }
     }
 
-    protected void ErroDeCriação (String msg){
+    protected void ErroDeCriação(String msg) {
         throw new IllegalArgumentException(msg);
     }
 
-    protected boolean VerificarTelefone(String telefone){
-        // Limpeza:
-        String apenasNumeros = telefone.replaceAll("[^0-9]", "");
+    protected String apenasNumeros(String NumerosSujos){
+        String apenasNumeros = NumerosSujos.replaceAll("[^0-9]", "");
+        return apenasNumeros;
+    }
 
-        // Validação
-        if (apenasNumeros.length() == 13){return true;} else {
+    protected boolean VerificarTelefone(String telefone) {
+        String NTelefone = apenasNumeros(telefone);
+
+        if (NTelefone.length() == 13) {
+            return true;
+        } else {
             ErroDeCriação("Número inválido. Certifique-se de incluir DDI, DDD e 9 dígitos.");
             return false;
         }
     }
 
     protected String formatarTelefone(String telefone) {
-        // Limpeza:
-        String apenasNumeros = telefone.replaceAll("[^0-9]", "");
+        String NTelefone = apenasNumeros(telefone);
 
-        String formatado = apenasNumeros.replaceFirst("(\\d{2})(\\d{2})(\\d{5})(\\d{4})", "+$1 ($2) $3-$4");           
+        String formatado = NTelefone.replaceFirst("(\\d{2})(\\d{2})(\\d{5})(\\d{4})", "+$1 ($2) $3-$4");
+        return formatado;
+    }
+
+    protected String formatarCpf(String cpf){
+        String numerosCPF = apenasNumeros(cpf);
+
+        String formatado = numerosCPF.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
         return formatado;
     }
 
@@ -78,9 +124,11 @@ import java.util.Scanner;
         boolean resultado;
 
         // Calculo:
-        String numerosCPF = cpfSujo.replaceAll("\\D", "");
+        String numerosCPF = apenasNumeros(cpfSujo);
 
-        /*CPFs devem ter 11 dígitos e não podem ser sequências repetida (ex:111.111...)*/
+        /*
+         * CPFs devem ter 11 dígitos e não podem ser sequências repetida (ex:111.111...)
+         */
         if (numerosCPF.length() != 11 || numerosCPF.matches("(\\d)\\1{10}")) {
             System.out.println("O CPF inserido está incorreto, verifique.");
             resultado = false;
@@ -144,31 +192,42 @@ import java.util.Scanner;
         return this.email;
     }
 
+    public String getTipo() {
+        return tipo;
+    }
+    
     public String getTelefone() {
         return this.telefone;
     }
 
-    
-    protected double calcularMulta(){
-        return 0.0;
+    public String getTelefoneformatado() {
+        return formatarTelefone(this.getTelefone());
     }
 
+    public String getCpfformatado() {
+        return formatarCpf(this.getCpf());
+    }
 
+    protected double calcularMulta() {
+        return 0.0;
+    }
+    //overide nas classes filhas
+
+/* teste 
     public static void main(String[] args) {
-        Usuario teste = new Usuario();
+        Usuario teste = new Usuario(1, "Andrey", "11414322933", "null email", "5547988001057");
 
         System.out.println(teste.getId_Usuario());
         System.out.println(teste.getNome());
         System.out.println(teste.getCpf());
+        System.out.println(teste.getCpfformatado());
         System.out.println(teste.getEmail());
         System.out.println(teste.getTelefone());
-
-
-        System.out.println("and it is begin");
+        System.out.println(teste.getTelefoneformatado());
     }
+*/
 
 }
 
 // USUARIO: ID, NOME, CPF, “IDADE, E-MAIL, TELEFONE”
 
-// metodo para calculo de multa
