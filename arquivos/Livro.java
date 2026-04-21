@@ -3,15 +3,15 @@ public /* abstract */ class Livro{
     String titulo;
     String Autor;
     int ano;
-    String genero;
+    int id_genero;
     String isbn;
 
-    protected Livro(int id_livro, String titulo, String Autor, int ano, String genero, String isbn) {
+    protected Livro(int id_livro, String titulo, String Autor, int ano, int id_genero, String isbn) {
         this.id_livro = id_livro;
         this.titulo = titulo;
         this.Autor = Autor;
         this.ano = ano;
-        this.genero = genero;
+        this.id_genero = id_genero;
         this.isbn = isbn;
     }
 
@@ -32,8 +32,8 @@ public /* abstract */ class Livro{
         this.ano = ano;
     }
 
-    public void setgenero(String genero) {
-        this.genero = genero;
+    public void setId_genero(int id_genero) {
+        this.id_genero = id_genero;
     }
 
     public void setIsbn(String isbn) {
@@ -41,27 +41,27 @@ public /* abstract */ class Livro{
     }
 
     public int getId_livro() {
-        return id_livro;
+        return this.id_livro;
     }
 
     public String getTitulo() {
-        return titulo;
+        return this.titulo;
     }
 
     public String getAutor() {
-        return Autor;
+        return this.Autor;
     }
 
     public int getAno() {
-        return ano;
+        return this.ano;
     }
 
-    public String getgenero() {
-        return genero;
+    public int getId_genero() {
+        return this.id_genero;
     }
 
     public String getIsbn() {
-        return isbn;
+        return this.isbn;
     }
     
     public static void main(String[] args) {

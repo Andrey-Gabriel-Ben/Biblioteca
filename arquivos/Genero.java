@@ -13,8 +13,8 @@ public class Genero {
     }
 
     protected void  buscarIdPorNome(String genero){
-        String select = "SELECT id FROM genero WHERE nome = ?";
-        int idEncontrado = -1; 
+        String select = "SELECT ID_GENERO FROM genero WHERE nome = ?";
+        int idEncontrado =  -1; 
 
         try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
 
@@ -22,15 +22,16 @@ public class Genero {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    idEncontrado = rs.getInt("id");
+                    idEncontrado = rs.getInt("ID_GENERO");
                 }
-            }
+            } 
 
         } catch (SQLException e) {
             ErroDeCriação("Erro ao buscar genero: " + e.getMessage());
         }
 
-        setId_genero(idEncontrado);
+        this.setId_genero(idEncontrado);
+        
     }
 
 //iniciar utils
@@ -68,7 +69,16 @@ public class Genero {
         return nome;
     }
 
+    public static void main(String[] args) {
+            //genero
+            Genero catLivro = new Genero(0, "Ficção Científica");
+            catLivro.buscarIdPorNome("Ficção Científica");
+            
+            System.out.println(catLivro.getId_genero());
 
+        
+
+    }
 
 
 

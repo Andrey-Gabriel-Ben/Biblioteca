@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ public class Usuario {
 // classes de cadastro
 
     public void cadastrarUsuario (String Tipo) {
-        try (Scanner scanner = new Scanner(System.in);) {
+        try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
             Usuario novoUsuario = new Usuario(0, null, null, null, null);
             
             // nome
@@ -86,39 +87,40 @@ public class Usuario {
         }
     }
     
-    public void cadastrarlivro (String Tipo) {
-        try (Scanner scanner = new Scanner(System.in);) {
-            Livro novoLivro = new Livro(0, null, null, 0, null, null);
-            
+    public void cadastrarlivro () {
+        try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
+            Livro novoLivro = new Livro(0, null, null, 0, 0, null);
+           
             // título
-            System.out.println("Digite o título do livro: ");
+            System.out.println("\nDigite o título do livro: ");
             String tituloImput = scanner.nextLine();
             if (!validarEntrada(tituloImput)){return;}
             novoLivro.setTitulo(tituloImput);
 
             //Autor
-            System.out.println("Digite o nome do autor do livro: ");
+            System.out.println("\nDigite o nome do autor do livro: ");
             String autorImput = scanner.nextLine();
             if (!validarEntrada(autorImput)){return;}
             novoLivro.setAutor(autorImput);
 
             //ano
-            System.out.println("Digite o ano de lançamento do livro: ");
+            System.out.println("\nDigite o ano de lançamento do livro: ");
             int anoImput = scanner.nextInt();
             if (!verificarAno(anoImput)){return;}
             novoLivro.setAno(anoImput);
             scanner.nextLine();
 
             //genero
-            System.out.println("Digite o nome da genero do livro: ");
+            System.out.println("\nDigite o nome da genero do livro: ");
             String generoImput = scanner.nextLine();
             if (!validarEntrada(generoImput)){return;}
             Genero catLivro = new Genero(0, generoImput);
             catLivro.buscarIdPorNome(generoImput);
-            novoLivro.setgenero(String.valueOf(catLivro.getId_genero()));
+            if (catLivro.getId_genero() <= 0) {return;}
+            novoLivro.setId_genero(catLivro.getId_genero());
 
             //isbn
-            System.out.println("Digite o nº do isbn do livro: ");
+            System.out.println("\nDigite o nº do isbn do livro: ");
             String isbnImput = scanner.nextLine();
             if (!calculaisbn(isbnImput)){return;}
             novoLivro.setIsbn(isbnImput);
@@ -126,24 +128,25 @@ public class Usuario {
             sendBookToDatabase(novoLivro);
 
         } catch (Exception e) {
-            System.out.println("Devido ao erro, usuario não foi criado, por favor tente novamente\n");
+            System.out.println("\nDevido ao erro, usuario não foi criado, por favor tente novamente\n");
         }
     }
 
     protected void sendBookToDatabase(Livro nvLivro){
-        String insert = "INSERT INTO LIVRO (titulo, autor, isbn, id_genero) VALUES (?, ?, ?, ?)";
+        String insert = "INSERT INTO LIVRO (titulo, autor, ano, isbn, ID_GENERO) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBanco.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(insert)) {
 
             stmt.setString(1, nvLivro.getTitulo());
             stmt.setString(2, nvLivro.getAutor());
-            stmt.setString(3, nvLivro.getIsbn());
-            stmt.setString(4, nvLivro.getgenero());
+            stmt.setInt(3, nvLivro.getAno());
+            stmt.setString(4, nvLivro.getIsbn());
+            stmt.setInt(5, nvLivro.getId_genero());
 
             stmt.execute();
 
-            System.out.println("O livro " + nvLivro.getTitulo() + " foi enviado para o banco!");
+            System.out.println("\nO livro " + nvLivro.getTitulo() + " foi enviado para o banco!");
 
         } catch (SQLException e) {
             ErroDeCriação("Erro ao salvar no banco: " + e.getMessage());
@@ -364,15 +367,15 @@ public class Usuario {
         return formatarCpf(this.getCpf());
     }
 
-
+// main teste
 
     public static void main(String[] args) {
-        
+        Usuario teste = new Usuario(001, "Mr. Bibliotecario", null, null, null);
 
+        teste.cadastrarlivro();
 
-
+        System.out.println("your code still alive");
     }
-
 }
 
-// USUARIO: ID, NOME, CPF, “IDADE, E-MAIL, TELEFONE”
+
