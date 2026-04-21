@@ -15,8 +15,8 @@ select * from usuarios;
 
 /*drop table GENERO;*/
 CREATE TABLE GENERO (
-	ID_GENERO INT auto_increment NOT NULL,
-    nome varchar(50),
+	ID_GENERO INT auto_increment NOT NULL ,
+    nome varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci unique,
     PRIMARY KEY(ID_GENERO)
 );
 select * FROM GENERO;
@@ -41,6 +41,17 @@ String titulo;
     String ano;
     String GENERO;
     String isbn;
+
+
+CREATE TABLE usuarios (
+    nome VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci_as;
+);
+
+
+
+ALTER TABLE genero
+ALTER COLUMN nome VARCHAR(50) COLLATE Latin1_General_CI_AS;
+-- CI = Case Insensitive, AS = Accent Sensitive
 
 
 
