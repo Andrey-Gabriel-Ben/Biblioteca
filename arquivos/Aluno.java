@@ -4,4 +4,5 @@ public class Aluno extends Usuario {
         super(id, nome, email, telefone, endereco);
         this.tipo = "Aluno";
     }
+
 }
