@@ -20,6 +20,8 @@ public class Usuario {
     }
     // reescrever nas subclasses com tipo e puxar dadsos do banco
 
+// classes de cadastro
+
     public void cadastrarUsuario (String Tipo) {
         try (Scanner scanner = new Scanner(System.in);) {
             Usuario novoUsuario = new Usuario(0, null, null, null, null);
@@ -84,22 +86,122 @@ public class Usuario {
         }
     }
     
+    public void cadastrarlivro (String Tipo) {
+        try (Scanner scanner = new Scanner(System.in);) {
+            Livro novoLivro = new Livro(0, null, null, 0, null, null);
+            
+            // título
+            System.out.println("Digite o título do livro: ");
+            String tituloImput = scanner.nextLine();
+            if (!validarEntrada(tituloImput)){return;}
+            novoLivro.setTitulo(tituloImput);
 
-    protected static boolean  validarEntrada(String entrada) {
-        if (entrada == null || entrada.trim().isEmpty()) {
-            System.err.println("O campo não pode estar vazio!");
+            //Autor
+            System.out.println("Digite o nome do autor do livro: ");
+            String autorImput = scanner.nextLine();
+            if (!validarEntrada(autorImput)){return;}
+            novoLivro.setAutor(autorImput);
+
+            //ano
+            System.out.println("Digite o ano de lançamento do livro: ");
+            int anoImput = scanner.nextInt();
+            if (!verificarAno(anoImput)){return;}
+            novoLivro.setAno(anoImput);
+            scanner.nextLine();
+
+            //genero
+            System.out.println("Digite o nome da genero do livro: ");
+            String generoImput = scanner.nextLine();
+            if (!validarEntrada(generoImput)){return;}
+            Genero catLivro = new Genero(0, generoImput);
+            catLivro.buscarIdPorNome(generoImput);
+            novoLivro.setgenero(String.valueOf(catLivro.getId_genero()));
+
+            //isbn
+            System.out.println("Digite o nº do isbn do livro: ");
+            String isbnImput = scanner.nextLine();
+            if (!calculaisbn(isbnImput)){return;}
+            novoLivro.setIsbn(isbnImput);
+
+            sendBookToDatabase(novoLivro);
+
+        } catch (Exception e) {
+            System.out.println("Devido ao erro, usuario não foi criado, por favor tente novamente\n");
+        }
+    }
+
+    protected void sendBookToDatabase(Livro nvLivro){
+        String insert = "INSERT INTO LIVRO (titulo, autor, isbn, id_genero) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = ConexaoBanco.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(insert)) {
+
+            stmt.setString(1, nvLivro.getTitulo());
+            stmt.setString(2, nvLivro.getAutor());
+            stmt.setString(3, nvLivro.getIsbn());
+            stmt.setString(4, nvLivro.getgenero());
+
+            stmt.execute();
+
+            System.out.println("O livro " + nvLivro.getTitulo() + " foi enviado para o banco!");
+
+        } catch (SQLException e) {
+            ErroDeCriação("Erro ao salvar no banco: " + e.getMessage());
+        }
+    }
+
+//verificações e calculos
+
+    protected boolean calculaisbn(String isbnSujo) {
+        String isbnLimpo = apenasNumeros(isbnSujo);
+
+        if (isbnLimpo.length() != 13 || isbnLimpo.matches("(\\d)\\1{10}")){
+            ErroDeCriação("O isbn inserido é invalido ou desatualizado");
             return false;
         }
-        return true;
+
+        try {
+            
+            //transforma em array
+            int[] isbnAray = new int[13];
+            for (int i = 0; i < 13; i++) {
+                isbnAray[i] = Character.getNumericValue(isbnLimpo.charAt(i));
+            }
+
+            //calcula:
+            //soma multiplicações
+            int soma = 0;
+            int peso;
+            for (int i = 0; i < 12; i++) {
+                if((i+1)%2 == 0) {peso = 3;} else {peso = 1;}
+                soma += isbnAray[i] * peso--;
+            }
+
+            //divide
+            int verificador = 10 - (soma%10);
+
+            //verifica
+            if (verificador == isbnAray[12]) {
+                return true;
+            } else {
+                ErroDeCriação("O isbn inserido está incorreto, verifique.");
+                return false;
+            }
+            
+        } catch (Exception e) {
+            ErroDeCriação("O isbn inserido é invalido ou desatualizado");
+            return false;
+        }
+
     }
 
-    protected void ErroDeCriação(String msg) {
-        System.err.println(msg);
-    }
-
-    protected String apenasNumeros(String NumerosSujos){
-        String apenasNumeros = NumerosSujos.replaceAll("[^0-9]", "");
-        return apenasNumeros;
+    protected boolean  verificarAno(int ano) {
+        if (ano >= 1000 && ano <= 9999) {
+            return true;
+        } else {
+            ErroDeCriação("Formato de ano adicionado incompativel, tente novamente");
+            return false;
+        }
     }
 
     protected boolean VerificarTelefone(String telefone) {
@@ -112,21 +214,7 @@ public class Usuario {
             return false;
         }
     }
-
-    protected String formatarTelefone(String telefone) {
-        String NTelefone = apenasNumeros(telefone);
-
-        String formatado = NTelefone.replaceFirst("(\\d{2})(\\d{2})(\\d{5})(\\d{4})", "+$1 ($2) $3-$4");
-        return formatado;
-    }
-
-    protected String formatarCpf(String cpf){
-        String numerosCPF = apenasNumeros(cpf);
-
-        String formatado = numerosCPF.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
-        return formatado;
-    }
-
+    
     protected boolean calcularCpf(String cpfSujo) {
         String numerosCPF = apenasNumeros(cpfSujo);
 
@@ -180,6 +268,46 @@ public class Usuario {
 
     }
 
+//utils
+    protected void ErroDeCriação(String msg) {
+        System.err.println(msg);
+    }
+
+    protected String apenasNumeros(String NumerosSujos){
+        String apenasNumeros = NumerosSujos.replaceAll("[^0-9]", "");
+        return apenasNumeros;
+    }
+    
+    protected static boolean  validarEntrada(String entrada) {
+        if (entrada == null || entrada.trim().isEmpty()) {
+            System.err.println("O campo não pode estar vazio!");
+            return false;
+        }
+        return true;
+    }
+    
+// formatações
+    protected String formatarTelefone(String telefone) {
+        String NTelefone = apenasNumeros(telefone);
+
+        String formatado = NTelefone.replaceFirst("(\\d{2})(\\d{2})(\\d{5})(\\d{4})", "+$1 ($2) $3-$4");
+        return formatado;
+    }
+
+    protected String formatarCpf(String cpf){
+        String numerosCPF = apenasNumeros(cpf);
+
+        String formatado = numerosCPF.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+        return formatado;
+    }
+
+//metodos necessarios
+    protected double calcularMulta() {
+        return 0.0;
+    }
+    //overide nas classes filhas
+
+//gets e sets
     public void setId_Usuario(int id_Usuario) {
         this.id_Usuario = id_Usuario;
     }
@@ -200,7 +328,6 @@ public class Usuario {
         this.telefone = telefone;
     }
 
-    
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
@@ -237,10 +364,6 @@ public class Usuario {
         return formatarCpf(this.getCpf());
     }
 
-    protected double calcularMulta() {
-        return 0.0;
-    }
-    //overide nas classes filhas
 
 
     public static void main(String[] args) {

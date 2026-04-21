@@ -1,44 +1,21 @@
-import java.util.Scanner;
-
-public /* abstract */ class Livro {
+public /* abstract */ class Livro{
     int id_livro;
     String titulo;
     String Autor;
-    String ano;
-    String Categoria;
+    int ano;
+    String genero;
     String isbn;
 
-    protected Livro(int id_livro, String titulo, String Autor, String ano, String Categoria, String isbn) {
+    protected Livro(int id_livro, String titulo, String Autor, int ano, String genero, String isbn) {
         this.id_livro = id_livro;
         this.titulo = titulo;
         this.Autor = Autor;
         this.ano = ano;
-        this.Categoria = Categoria;
+        this.genero = genero;
         this.isbn = isbn;
     }
 
-    public void cadastrarLivro() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            // titulo
-            System.out.print("Digite o nome do Livro: ");
-            String nomeImput = scanner.nextLine();
-            validarEntrada(nomeImput);
-            setNome(nomeImput);
-            
-            //this.sendUserToDatabase();
-
-        } catch (Exception e) {
-            System.out.println("Devido ao erro, Livro não foi criado, por favor tente novamente\n");
-        }
-
-    }
-
-    public static void validarEntrada(String entrada) throws Exception {
-        if (entrada == null || entrada.trim().isEmpty()) {
-            throw new Exception("O campo não pode estar vazio!");
-        }
-    }
-
+ 
     public void setId_livro(int id_livro) {
         this.id_livro = id_livro;
     }
@@ -51,12 +28,12 @@ public /* abstract */ class Livro {
         this.Autor = Autor;
     }
 
-    public void setAno(String ano) {
+    public void setAno(int ano) {
         this.ano = ano;
     }
 
-    public void setCategoria(String Categoria) {
-        this.Categoria = Categoria;
+    public void setgenero(String genero) {
+        this.genero = genero;
     }
 
     public void setIsbn(String isbn) {
@@ -75,22 +52,24 @@ public /* abstract */ class Livro {
         return Autor;
     }
 
-    public String getAno() {
+    public int getAno() {
         return ano;
     }
 
-    public String getCategoria() {
-        return Categoria;
+    public String getgenero() {
+        return genero;
     }
 
     public String getIsbn() {
         return isbn;
     }
     
-    
+    public static void main(String[] args) {
+        
+    }
     
 
 
 }
 
-// LIVRO: ID, TITULO, AUTOR, EDITORA, ANO PUBLICAÇÃO, “CATEGORIA”, EDIÇÃO, ISBN
+// LIVRO: ID, TITULO, AUTOR, EDITORA, ANO PUBLICAÇÃO, “genero”, EDIÇÃO, ISBN
