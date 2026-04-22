@@ -1,3 +1,5 @@
+-- esses são imputs para alimentar o banco
+
 INSERT INTO genero (nome) VALUES 
 ('Ficção Científica'),
 ('Fantasia'),
