@@ -1,14 +1,17 @@
-create database bibliotecajava;
+create database bibliotecajava
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_0900_ai_ci;
 /*drop database bibliotecajava;*/
 
 /*drop table usuarios;*/
 CREATE TABLE USUARIOS(
-	ID_GENERO int AUTO_INCREMENT NOT NULL,
+	ID_USUARIO int AUTO_INCREMENT NOT NULL,
 	NOME VARCHAR(100) NOT NULL,
     CPF char(11) NOT NULL unique, 
     EMAIL VARCHAR(254) NOT NULL unique,
 	TELEFONE char(19) NOT NULL,
     TIPO VARCHAR(10),
+    
 	PRIMARY KEY(CODIGO_USUARIO)
 );
 select * from usuarios;
@@ -16,7 +19,8 @@ select * from usuarios;
 /*drop table GENERO;*/
 CREATE TABLE GENERO (
 	ID_GENERO INT auto_increment NOT NULL ,
-    nome varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci unique,
+    nome varchar(50) unique,
+    
     PRIMARY KEY(ID_GENERO)
 );
 select * FROM GENERO;
@@ -35,25 +39,31 @@ CREATE TABLE LIVRO (
 );
 select * FROM LIVRO;
 
-/*
-String titulo;
-    String Autor;
-    String ano;
-    String GENERO;
-    String isbn;
+/*drop table EXEMPLAR;*/
+create table EXEMPLAR (
+	ID_EXEMPLAR int auto_increment not null,
+	ID_LIVRO int not null,
+    aquisição date not null,
+    status char(12),
+    
+    primary key (ID_EXEMPLAR),
+    constraint fk_livro_exemplar foreign key(ID_LIVRO) REFERENCES LIVRO(ID_LIVRO)
+)
+select * FROM EXEMPLAR;
 
+/*drop TABLE EMPRESTIMO*/
+CREATE TABLE EMPRESTIMO (
+	ID_EMPRESTIMO INT auto_increment NOT NULL,
+    ID_USUARIO int NOT NULL,
+    ID_EXEMPLAR INT NOT NULL,
+    DATA_EMPRESTIMO DATE NOT NULL,
+    DEVOLUÇÃO_DATA DATE NOT NULL,
+    
+    primary key (ID_EMPRESTIMO),
+    constraint fk_USUARIOS_EMPRESTIMO foreign key(ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO),
+	constraint fk_EXEMPLAR_EMPRESTIMO foreign key(ID_EXEMPLAR) REFERENCES EXEMPLAR(ID_EXEMPLAR)
+)
+SELECT * FROM EMPRESTIMO;
 
-CREATE TABLE usuarios (
-    nome VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci_as;
-);
-
-
-
-ALTER TABLE genero
-ALTER COLUMN nome VARCHAR(50) COLLATE Latin1_General_CI_AS;
--- CI = Case Insensitive, AS = Accent Sensitive
-
-
-
-*/
-
+ALTER TABLE usuarios
+rename column CODIGO_USUARIO TO ID_USUARIO;
