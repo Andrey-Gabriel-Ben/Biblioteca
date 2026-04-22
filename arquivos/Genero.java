@@ -4,8 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Genero {
-    int id_genero;
-    String nome;
+    private int id_genero;
+    private String nome;
 
     public Genero (int id_genero, String nome) {
         this.id_genero = id_genero;

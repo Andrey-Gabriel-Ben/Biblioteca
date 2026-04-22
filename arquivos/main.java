@@ -1,5 +1,10 @@
 public class Main {
-
+    
+    public void exibirInterfaçe(){
+        do { 
+            
+        } while (true);
+    }
     
 
 

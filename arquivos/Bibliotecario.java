@@ -15,7 +15,7 @@ public class Bibliotecario extends Usuario {
 
 // metodos de cadastro
 
-    public void cadastrarUsuario (String Tipo) {
+    private void cadastrarUsuario (String Tipo) {
         try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
             Usuario novoUsuario = new Usuario(0, null, null, null, null);
             
@@ -55,7 +55,7 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    protected void sendUserToDatabase(Usuario usuario) {
+    private void sendUserToDatabase(Usuario usuario) {
         String insert = "INSERT INTO usuarios (nome, cpf, email, telefone, tipo) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBanco.getConnection();
@@ -96,7 +96,7 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    public void cadastrarlivro () {
+    private void cadastrarlivro () {
         try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
             Livro novoLivro = new Livro(0, null, null, 0, 0, null);
            
@@ -141,7 +141,7 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    protected void sendBookToDatabase(Livro nvLivro){
+    private void sendBookToDatabase(Livro nvLivro){
         String insert = "INSERT INTO LIVRO (titulo, autor, ano, isbn, ID_GENERO) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBanco.getConnection();
@@ -170,7 +170,7 @@ public class Bibliotecario extends Usuario {
         }
     }
     
-    public void cadastrarExemplar () {
+    private void cadastrarExemplar () {
         try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
             Exemplar novoExemplar = new Exemplar(-1, -1, null, "Disponivel");
            
@@ -193,7 +193,7 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    protected void sendCopyToDatabase(Exemplar nvExemplar){
+    private void sendCopyToDatabase(Exemplar nvExemplar){
         String insert = "insert into exemplar (ID_LIVRO, aquisição, status) values (?, STR_TO_DATE(?, '%d/%m/%Y'), ?)";
 
         try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(insert)) {
@@ -211,7 +211,8 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-        
+    //private
+
     public static void main(String[] args) {
         Bibliotecario Bibliotecario = new Bibliotecario(001, "Jujite", null, null, null);
         

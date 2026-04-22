@@ -4,10 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Exemplar {
-    int id_exemplar;
-    int id_livro;
-    String aquisição;
-    String Status;
+    private int id_exemplar;
+    private int id_livro;
+    private String aquisição;
+    private String Status;
 
     public Exemplar(int id_exemplar, int id_livro, String aquisição, String Status){
         this.id_exemplar = id_exemplar;

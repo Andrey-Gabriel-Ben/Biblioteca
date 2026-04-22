@@ -1,10 +1,10 @@
-public /* abstract */ class Livro{
-    int id_livro;
-    String titulo;
-    String Autor;
-    int ano;
-    int id_genero;
-    String isbn;
+public class Livro{
+    private int id_livro;
+    private String titulo;
+    private String Autor;
+    private int ano;
+    private int id_genero;
+    private String isbn;
 
     protected Livro(int id_livro, String titulo, String Autor, int ano, int id_genero, String isbn) {
         this.id_livro = id_livro;

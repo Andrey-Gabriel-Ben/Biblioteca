@@ -1,8 +1,8 @@
 public class Emprestimos {
-    int id_emprestimo;
-    int id_usuario;
-    String data_Emprestimo;
-    String data_Devolução;
+    private int id_emprestimo;
+    private int id_usuario;
+    private String data_Emprestimo;
+    private String data_Devolução;
     
     public Emprestimos (int id_emprestimo, int id_usuario, String data_Emprestimo, String data_Devolução){
         this.id_emprestimo = id_emprestimo;
