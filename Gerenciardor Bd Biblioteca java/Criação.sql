@@ -65,5 +65,6 @@ CREATE TABLE EMPRESTIMO (
 )
 SELECT * FROM EMPRESTIMO;
 
-ALTER TABLE usuarios
-rename column CODIGO_USUARIO TO ID_USUARIO;
+ALTER database bibliotecajava
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_0900_ai_ci;

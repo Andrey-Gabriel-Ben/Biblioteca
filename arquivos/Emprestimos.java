@@ -42,6 +42,4 @@ public class Emprestimos {
     public String getData_Devolução() {
         return this.data_Devolução;
     }
-    
-    
 }

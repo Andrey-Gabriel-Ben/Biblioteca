@@ -2,6 +2,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Bibliotecario extends Usuario {
@@ -121,10 +123,10 @@ public class Bibliotecario extends Usuario {
             System.out.println("\nDigite o nome da genero do livro: ");
             String generoImput = scanner.nextLine();
             if (!validarEntrada(generoImput)){return;}
-            Genero catLivro = new Genero(0, generoImput);
-            catLivro.buscarIdPorNome(generoImput);
-            if (catLivro.getId_genero() <= 0) {return;}
-            novoLivro.setId_genero(catLivro.getId_genero());
+            Genero generoLivro = new Genero(0, generoImput);
+            generoLivro.buscarIdPorNome(generoImput);
+            if (generoLivro.getId_genero() <= 0) {return;}
+            novoLivro.setId_genero(generoLivro.getId_genero());
 
             //isbn
             System.out.println("\nDigite o nº do isbn do livro: ");
@@ -168,5 +170,53 @@ public class Bibliotecario extends Usuario {
         }
     }
     
+    public void cadastrarExemplar () {
+        try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
+            Exemplar novoExemplar = new Exemplar(-1, -1, null, "Disponivel");
+           
+            // id-Livro
+            System.out.println("\nDigite o nome do livro: ");
+            String nomeImput = scanner.nextLine();
+            if (!validarEntrada(nomeImput)){return;}
+            novoExemplar.buscarIdPorNomeLivro(nomeImput);
+            //setter na função
+
+            //aquisição
+            LocalDate hoje = LocalDate.now();
+            DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dataHojeTexto = hoje.format(formatador);            
+            novoExemplar.setAquisição(dataHojeTexto);
+
+            sendCopyToDatabase(novoExemplar);
+        } catch (Exception e) {
+            System.out.println("\nDevido ao erro, usuario não foi criado, por favor tente novamente\n");
+        }
+    }
+
+    protected void sendCopyToDatabase(Exemplar nvExemplar){
+        String insert = "insert into exemplar (ID_LIVRO, aquisição, status) values (?, STR_TO_DATE(?, '%d/%m/%Y'), ?)";
+
+        try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(insert)) {
+            
+            stmt.setInt(1, nvExemplar.getId_livro());
+            stmt.setString(2, nvExemplar.getAquisição());
+            stmt.setString(3, nvExemplar.getStatus());
+
+            stmt.execute();
+
+            System.out.println("\nO novo exemplar foi enviado para o banco!");
+
+        } catch (SQLException e) {
+            System.err.println("Erro técnico ao salvar: " + e.getMessage());
+        }
+    }
+
+        
+    public static void main(String[] args) {
+        Bibliotecario Bibliotecario = new Bibliotecario(001, "Jujite", null, null, null);
+        
+        Bibliotecario.cadastrarExemplar();
+    }
+
 
 }
