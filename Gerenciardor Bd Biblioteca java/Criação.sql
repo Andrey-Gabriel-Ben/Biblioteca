@@ -30,7 +30,7 @@ CREATE TABLE LIVRO (
 	ID_LIVRO int auto_increment not null,
     titulo varchar(150) not null,
     autor varchar(100) not null,
-    ano year not null,
+    ano_lançamento smallint not null,
     isbn char(13) not null unique,
 	ID_GENERO int not null,
     

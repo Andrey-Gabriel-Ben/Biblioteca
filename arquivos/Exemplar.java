@@ -16,8 +16,8 @@ public class Exemplar {
         this.Status = Status;
     }
 
-    private int buscarIdDisponivelPorIdLivro(int id_livro){
-        String select = "select ID_EXEMPLAR from exemplar where ID_LIVRO = ? and status = \"DISPONÍVEL\";";
+    public int buscarIdDisponivelPorIdLivro(int id_livro){
+        String select = "select ID_EXEMPLAR from exemplar where ID_LIVRO = ? and status = 'DISPONÍVEL';";
         int idEncontrado = -1;
 
         try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
@@ -27,7 +27,7 @@ public class Exemplar {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     idEncontrado = rs.getInt("ID_EXEMPLAR");
-                }
+                } else {System.err.println("Nenhum exemplar Disponivel encontrado");}
             }
 
         } catch (SQLException e) {
@@ -71,5 +71,11 @@ public class Exemplar {
         return this.Status;
     }
 
+    public static void main(String[] args) {
+        Exemplar ex = new Exemplar(0, 0, null, null);
+
+        int teste = ex.buscarIdDisponivelPorIdLivro(6);
+        System.out.println(teste);
+    }
     
 }

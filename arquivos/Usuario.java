@@ -44,13 +44,22 @@ public class Usuario {
 
     // verificações e calculos
 
-    protected boolean verificarAno(int ano) {
-        if (ano >= 1000 && ano <= 9999) {
-            return true;
-        } else {
-            System.err.println("Formato de ano adicionado incompativel, tente novamente");
-            return false;
-        }
+    protected int converterAno(String ano) {
+        int anoInt = 0;
+
+        try {
+            if (ano.contains("ac") || ano.contains("AC")) {
+                anoInt = Integer.parseInt(ano) * (-1);
+            } else {
+                anoInt = Integer.parseInt(ano);
+            }
+
+        } catch (NumberFormatException e) {
+            System.err.println("Ano inserido invalido, verifique e tente novamente");
+
+        } 
+        
+        return anoInt;
     }
 
     protected boolean VerificarTelefone(String telefone) {
