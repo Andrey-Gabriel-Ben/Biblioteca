@@ -13,35 +13,35 @@ public class Bibliotecario extends Usuario {
         this.tipo = "Bibliotecario";
     }
 
-// metodos de cadastro
+// metodos de cadastro E UPLOAD
 
-    private void cadastrarUsuario (String Tipo) {
+    private boolean cadastrarUsuario (String Tipo) {
         try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
             Usuario novoUsuario = new Usuario(0, null, null, null, null);
             
             // nome
-            System.out.print("Digite o nome do usuario: ");
+            System.out.println("\nDigite o nome do usuario: ");
             String nomeImput = scanner.nextLine();
-            if (!validarEntrada(nomeImput)){return;}
+            if (!validarEntrada(nomeImput)){return false;}
             novoUsuario.setNome(nomeImput);
 
             // cpf
-            System.out.print("Digite o CPF do usuario: ");
+            System.out.println("\nDigite o CPF do usuario: ");
             String cpfimput = scanner.nextLine();
-            if (!calcularCpf(cpfimput)){return;}
+            if (!calcularCpf(cpfimput)){return false;}
             cpfimput = apenasNumeros(cpfimput);
             novoUsuario.setCpf(cpfimput);
 
             // E-mail
-            System.out.print("Digite o E-mail do usuario: ");
+            System.out.println("\nDigite o E-mail do usuario: ");
             String emailImput = scanner.nextLine();
-            if (!validarEntrada(emailImput)){return;}
+            if (!validarEntrada(emailImput)){return false;}
             novoUsuario.setEmail(emailImput);
 
             // Telefone
-            System.out.println("Digite o telefone do usuario contendo DDI, DDD e 9 dígitos.");
+            System.out.println("\nDigite o telefone do usuario contendo DDI, DDD e 9 dígitos.");
             String telefoneImput = scanner.nextLine();
-            if(!VerificarTelefone(telefoneImput)){return;}
+            if(!VerificarTelefone(telefoneImput)){return false;}
             telefoneImput = apenasNumeros(telefoneImput);
             novoUsuario.setTelefone(telefoneImput);
 
@@ -50,8 +50,10 @@ public class Bibliotecario extends Usuario {
 
             sendUserToDatabase(novoUsuario);
 
+            return true;
         } catch (Exception e) {
-            System.out.println("Devido ao erro, usuario não foi criado, por favor tente novamente\n");
+            System.err.println("\nDevido ao erro, usuario não foi criado, por favor tente novamente\n");
+            return false;
         }
     }
 
@@ -69,7 +71,7 @@ public class Bibliotecario extends Usuario {
 
             stmt.execute();
 
-            System.out.println("Usuário " + usuario.getNome() + " enviado para o banco!");
+            System.out.println("\nUsuário " + usuario.getNome() + " enviado para o banco!");
 
         } catch (SQLException e) {
             System.err.println("\n--- AVISO DE CADASTRO ---");
@@ -78,66 +80,65 @@ public class Bibliotecario extends Usuario {
                     String mensagem = e.getMessage();
 
                     if (mensagem.contains("cpf")) {
-                        System.err.println("Erro: Já existe um usuário cadastrado com este CPF.");
+                        System.err.println("\nErro: Já existe um usuário cadastrado com este CPF.");
                         return;
                     } 
 
                     if (mensagem.contains("email")) {
-                        System.err.println("Erro: Já existe um cadastro com esse E-mail");
+                        System.err.println("\nErro: Já existe um cadastro com esse E-mail");
                         return;
                     } 
 
-                    System.err.println("O usuario já existe no sistema.");
+                    System.err.println("\nO usuario já existe no sistema.");
                 }
                 default -> {
-                    System.err.println("Erro técnico ao salvar: " + e.getMessage());
+                    System.err.println("\nErro técnico ao salvar: " + e.getMessage());
                 }
             }
         }
     }
 
-    private void cadastrarlivro () {
+    private boolean cadastrarlivro () {
         try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
             Livro novoLivro = new Livro(0, null, null, 0, 0, null);
            
             // título
             System.out.println("\nDigite o título do livro: ");
             String tituloImput = scanner.nextLine();
-            if (!validarEntrada(tituloImput)){return;}
+            if (!validarEntrada(tituloImput)){return false;}
             novoLivro.setTitulo(tituloImput);
 
             //Autor
             System.out.println("\nDigite o nome do autor do livro: ");
             String autorImput = scanner.nextLine();
-            if (!validarEntrada(autorImput)){return;}
+            if (!validarEntrada(autorImput)){return false;}
             novoLivro.setAutor(autorImput);
 
             //ano
             System.out.println("\nDigite o ano de lançamento do livro: ");
             int anoImput = scanner.nextInt();
-            if (!verificarAno(anoImput)){return;}
+            if (!verificarAno(anoImput)){return false;}
             novoLivro.setAno(anoImput);
             scanner.nextLine();
 
             //genero
             System.out.println("\nDigite o nome da genero do livro: ");
             String generoImput = scanner.nextLine();
-            if (!validarEntrada(generoImput)){return;}
             Genero generoLivro = new Genero(0, generoImput);
-            generoLivro.buscarIdPorNome(generoImput);
-            if (generoLivro.getId_genero() <= 0) {return;}
-            novoLivro.setId_genero(generoLivro.getId_genero());
+            novoLivro.setId_genero(generoLivro.buscarIdPorNome(generoImput));
 
             //isbn
             System.out.println("\nDigite o nº do isbn do livro: ");
             String isbnImput = scanner.nextLine();
-            if (!calculaisbn(isbnImput)){return;}
+            if (!novoLivro.calculaisbn(isbnImput)){return false;}
             novoLivro.setIsbn(isbnImput);
 
             sendBookToDatabase(novoLivro);
 
+            return true;
         } catch (Exception e) {
             System.out.println("\nDevido ao erro, usuario não foi criado, por favor tente novamente\n");
+            return false;
         }
     }
 
@@ -161,25 +162,26 @@ public class Bibliotecario extends Usuario {
             switch (e.getErrorCode()) {
                 case 1062 -> {
                     System.err.println("\n--- AVISO DE CADASTRO ---");
-                    System.err.println("O ISBN [" + nvLivro.getIsbn() + "] já existe no sistema.");
+                    System.err.println("\nO ISBN [" + nvLivro.getIsbn() + "] já existe no sistema.");
                 }
                 default -> {
-                    System.err.println("Erro técnico ao salvar: " + e.getMessage());
+                    System.err.println("\nErro técnico ao salvar: " + e.getMessage());
                 }
             }
         }
     }
     
-    private void cadastrarExemplar () {
+    private boolean cadastrarExemplar () {
         try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
             Exemplar novoExemplar = new Exemplar(-1, -1, null, "Disponivel");
            
             // id-Livro
             System.out.println("\nDigite o nome do livro: ");
             String nomeImput = scanner.nextLine();
-            if (!validarEntrada(nomeImput)){return;}
-            novoExemplar.buscarIdPorNomeLivro(nomeImput);
-            //setter na função
+            Livro livroid = new Livro(0, nomeImput, null, 0, 0, null);
+            int id_livro = livroid.buscarIdPorNomeLivro(nomeImput);
+            if (id_livro <= 0) {return false;}
+            novoExemplar.setId_livro(id_livro);
 
             //aquisição
             LocalDate hoje = LocalDate.now();
@@ -188,8 +190,11 @@ public class Bibliotecario extends Usuario {
             novoExemplar.setAquisição(dataHojeTexto);
 
             sendCopyToDatabase(novoExemplar);
+
+            return true;
         } catch (Exception e) {
             System.out.println("\nDevido ao erro, usuario não foi criado, por favor tente novamente\n");
+            return false;
         }
     }
 
@@ -207,17 +212,50 @@ public class Bibliotecario extends Usuario {
             System.out.println("\nO novo exemplar foi enviado para o banco!");
 
         } catch (SQLException e) {
-            System.err.println("Erro técnico ao salvar: " + e.getMessage());
+            System.err.println("\nErro técnico ao salvar: " + e.getMessage());
         }
     }
 
+    private boolean cadastrarEmprestimo(){
+        try (Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) {
+            Emprestimos nvEmprestimo = new Emprestimos(0, 0,0, null, null );
+
+            //id_Usuario
+            System.out.println("\nDigite o nome do usuario: ");
+            String nomeImput = scanner.nextLine();
+            int id_usuario = buscarIdPorNome(nomeImput);
+            if (id_usuario <= 0){return false;}
+            nvEmprestimo.setId_usuario(id_usuario);
+            
+            //id_exemplar
+
+
+
+            // data emprestimo
+            LocalDate hoje = LocalDate.now();
+            DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dataHojeTexto = hoje.format(formatador);            
+            nvEmprestimo.setData_Emprestimo(dataHojeTexto);
+
+            // data devolução
+            
+
+
+            return true;
+        } catch (Exception e) {
+            System.out.println("\nDevido ao erro, usuario não foi criado, por favor tente novamente\n");
+            return false;
+        }
+    }
     //private
 
+
+ /*
     public static void main(String[] args) {
         Bibliotecario Bibliotecario = new Bibliotecario(001, "Jujite", null, null, null);
         
-        Bibliotecario.cadastrarExemplar();
+        Bibliotecario.cadastrarUsuario("Professor");
     }
-
+ */
 
 }

@@ -12,7 +12,7 @@ public class Genero {
         this.nome = nome;
     }
 
-    protected void  buscarIdPorNome(String genero){
+    protected int  buscarIdPorNome(String genero){
         String select = "SELECT ID_GENERO FROM genero WHERE nome = ?";
         int idEncontrado =  -1; 
 
@@ -27,10 +27,10 @@ public class Genero {
             } 
 
         } catch (SQLException e) {
-            ErroDeCriação("Erro ao buscar genero: " + e.getMessage());
+            System.err.println("Erro ao buscar genero: " + e.getMessage());
         }
 
-        this.setId_genero(idEncontrado);
+        return idEncontrado;
         
     }
 
@@ -38,10 +38,6 @@ public class Genero {
     protected String apenasNumeros(String NumerosSujos){
         String apenasNumeros = NumerosSujos.replaceAll("[^0-9]", "");
         return apenasNumeros;
-    }
-
-    protected void ErroDeCriação(String msg) {
-        System.err.println(msg);
     }
 
     protected static boolean  validarEntrada(String entrada){

@@ -1,9 +1,14 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Usuario {
     protected int id_Usuario;
     protected String nome;
     protected String cpf;
-    protected String email; 
-    protected String telefone; 
+    protected String email;
+    protected String telefone;
     protected String tipo;
 
     protected Usuario(int id_Usuario, String nome, String cpf, String email, String telefone) {
@@ -14,58 +19,36 @@ public class Usuario {
         this.telefone = telefone;
     }
 
+    // buscas
+    protected int buscarIdPorNome(String nome) {
+        String select = "select ID_USUARIO from usuarios where NOME = ?;";
+        int idEncontrado = -1;
 
-//verificações e calculos
+        try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
 
+            stmt.setString(1, nome);
 
-    protected boolean calculaisbn(String isbnSujo) {
-        String isbnLimpo = apenasNumeros(isbnSujo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    idEncontrado = rs.getInt("ID_USUARIO");
+                }
+            }
 
-        if (isbnLimpo.length() != 13 || isbnLimpo.matches("(\\d)\\1{10}")){
-            ErroDeCriação("O isbn inserido é invalido ou desatualizado");
-            return false;
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar Usuario: " + e.getMessage());
         }
 
-        try {
-            
-            //transforma em array
-            int[] isbnAray = new int[13];
-            for (int i = 0; i < 13; i++) {
-                isbnAray[i] = Character.getNumericValue(isbnLimpo.charAt(i));
-            }
-
-            //calcula:
-            //soma multiplicações
-            int soma = 0;
-            int peso;
-            for (int i = 0; i < 12; i++) {
-                if((i+1)%2 == 0) {peso = 3;} else {peso = 1;}
-                soma += isbnAray[i] * peso--;
-            }
-
-            //divide
-            int verificador = 10 - (soma%10);
-
-            //verifica
-            if (verificador == isbnAray[12]) {
-                return true;
-            } else {
-                ErroDeCriação("O isbn inserido está incorreto, verifique.");
-                return false;
-            }
-            
-        } catch (Exception e) {
-            ErroDeCriação("O isbn inserido é invalido ou desatualizado");
-            return false;
-        }
+        return idEncontrado;
 
     }
 
-    protected boolean  verificarAno(int ano) {
+    // verificações e calculos
+
+    protected boolean verificarAno(int ano) {
         if (ano >= 1000 && ano <= 9999) {
             return true;
         } else {
-            ErroDeCriação("Formato de ano adicionado incompativel, tente novamente");
+            System.err.println("Formato de ano adicionado incompativel, tente novamente");
             return false;
         }
     }
@@ -76,16 +59,16 @@ public class Usuario {
         if (NTelefone.length() == 13) {
             return true;
         } else {
-            ErroDeCriação("Número inválido. Certifique-se de incluir DDI, DDD e 9 dígitos.");
+            System.err.println("Número inválido. Certifique-se de incluir DDI, DDD e 9 dígitos.");
             return false;
         }
     }
-    
+
     protected boolean calcularCpf(String cpfSujo) {
         String numerosCPF = apenasNumeros(cpfSujo);
 
         if (numerosCPF.length() != 11 || numerosCPF.matches("(\\d)\\1{10}")) {
-            ErroDeCriação("O CPF inserido está incorreto, verifique.");
+            System.err.println("O CPF inserido está incorreto, verifique.");
             return false;
         }
 
@@ -123,36 +106,33 @@ public class Usuario {
             if (verificador1 == cpfAray[9] && verificador2 == cpfAray[10]) {
                 return true;
             } else {
-                ErroDeCriação("O CPF inserido está incorreto, verifique.");
+                System.err.println("O CPF inserido está incorreto, verifique.");
                 return false;
             }
 
         } catch (Exception e) {
-            ErroDeCriação("O CPF inserido está incorreto, verifique.");
+            System.err.println("O CPF inserido está incorreto, verifique.");
             return false;
         }
 
     }
 
-//utils
-    protected void ErroDeCriação(String msg) {
-        System.err.println(msg);
-    }
+    // utils
 
-    protected String apenasNumeros(String NumerosSujos){
+    protected String apenasNumeros(String NumerosSujos) {
         String apenasNumeros = NumerosSujos.replaceAll("[^0-9]", "");
         return apenasNumeros;
     }
-    
-    protected static boolean  validarEntrada(String entrada) {
+
+    protected static boolean validarEntrada(String entrada) {
         if (entrada == null || entrada.trim().isEmpty()) {
             System.err.println("O campo não pode estar vazio!");
             return false;
         }
         return true;
     }
-    
-// formatações
+
+    // formatações
     protected String formatarTelefone(String telefone) {
         String NTelefone = apenasNumeros(telefone);
 
@@ -160,20 +140,20 @@ public class Usuario {
         return formatado;
     }
 
-    protected String formatarCpf(String cpf){
+    protected String formatarCpf(String cpf) {
         String numerosCPF = apenasNumeros(cpf);
 
         String formatado = numerosCPF.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
         return formatado;
     }
 
-//metodos necessarios
+    // metodos necessarios
     protected double calcularMulta() {
         return 0.0;
     }
-    //overide nas classes filhas
+    // overide nas classes filhas
 
-//gets e sets
+    // gets e sets
     public void setId_Usuario(int id_Usuario) {
         this.id_Usuario = id_Usuario;
     }
@@ -217,7 +197,7 @@ public class Usuario {
     public String getTipo() {
         return tipo;
     }
-    
+
     public String getTelefone() {
         return this.telefone;
     }
@@ -230,10 +210,8 @@ public class Usuario {
         return formatarCpf(this.getCpf());
     }
 
-// main teste
+    // main teste
 
     public static void main(String[] args) {
     }
 }
-
-
