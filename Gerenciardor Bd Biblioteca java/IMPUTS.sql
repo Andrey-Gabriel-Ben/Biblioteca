@@ -22,7 +22,4 @@ INSERT INTO genero (nome) VALUES
 ('HQs e Mangás'),
 ('Clássicos');
 
-insert into exemplar (ID_LIVRO, aquisição, status) values (?, STR_TO_DATE(?, '%d/%m/%Y'), ?)
-
-SELECT ID_GENERO FROM genero WHERE nome = "Ficção Científica";
-SELECT * FROM LIVRO;
+select ID_USUARIO from usuarios where NOME = ?;
