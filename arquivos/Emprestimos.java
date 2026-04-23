@@ -13,6 +13,11 @@ public class Emprestimos {
         this.data_Devolução = data_Devolução;
     }
 
+    //getters e setters;
+    public void setId_exemplar(int id_exemplar){
+        this.id_exemplar = id_exemplar;
+    }
+
     public void setId_emprestimo(int id_emprestimo) {
         this.id_emprestimo = id_emprestimo;
     }
@@ -37,11 +42,16 @@ public class Emprestimos {
         return this.id_usuario;
     }
 
+    public int getId_exemplar() {
+        return this.id_exemplar;
+    }
+
     public String getData_Emprestimo() {
         return this.data_Emprestimo;
     }
 
     public String getData_Devolução() {
+
         return this.data_Devolução;
     }
 }

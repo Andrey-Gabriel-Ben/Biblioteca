@@ -1,3 +1,8 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Exemplar {
     private int id_exemplar;
     private int id_livro;
@@ -11,7 +16,29 @@ public class Exemplar {
         this.Status = Status;
     }
 
+    private int buscarIdDisponivelPorIdLivro(int id_livro){
+        String select = "select ID_EXEMPLAR from exemplar where ID_LIVRO = ? and status = \"DISPONÍVEL\";";
+        int idEncontrado = -1;
 
+        try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
+
+            stmt.setInt(1, id_livro);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    idEncontrado = rs.getInt("ID_EXEMPLAR");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar Exemplar: " + e.getMessage());
+        }
+
+        return idEncontrado;
+    }
+
+
+    //getters e stters
     public void setId_exemplar(int id_exemplar) {
         this.id_exemplar = id_exemplar;
     }
