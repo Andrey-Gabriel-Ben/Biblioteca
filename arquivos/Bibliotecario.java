@@ -254,7 +254,9 @@ public class Bibliotecario extends Usuario {
             int id_livro = lv.buscarIdPorNomeLivro(titulo);
             Exemplar exemplar = new Exemplar(0, 0, null, null);
             int id_exemplar = exemplar.buscarIdDisponivelPorIdLivro(id_livro);
-            if (id_exemplar <= 0) {return false;}
+            if (id_exemplar <= 0) {
+                return false;
+            }
             nvEmprestimo.setId_exemplar(id_exemplar);
 
             // data emprestimo
@@ -268,7 +270,10 @@ public class Bibliotecario extends Usuario {
             String devoluçãoTexto = devolução.format(formatador);
             nvEmprestimo.setData_Devolução(devoluçãoTexto);
 
+            exemplar.alterarStatus(id_exemplar, "INDISPONÍVEL");
+
             sendEmprestimoToDatabase(nvEmprestimo);
+
 
             return true;
         } catch (Exception e) {
@@ -277,15 +282,16 @@ public class Bibliotecario extends Usuario {
         }
     }
 
+
     private void sendEmprestimoToDatabase(Emprestimos emprestimo) {
-        String insert = "insert into emprestimo (ID_USUARIO, ID_EXEMPLAR, DATA_EMPRESTIMO, DEVOLUÇÃO_DATA) values(?, ?, STR_TO_DATE('?', '%d/%m/%Y'), STR_TO_DATE('?', '%d/%m/%Y'));";
+        String insert = "insert into emprestimo (ID_USUARIO, ID_EXEMPLAR, DATA_EMPRESTIMO, DEVOLUÇÃO_DATA, status) values(?, ?, STR_TO_DATE(?, '%d/%m/%Y'), STR_TO_DATE(?, '%d/%m/%Y'));";
 
         try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(insert)) {
 
             stmt.setInt(1, emprestimo.getId_usuario());
-            stmt.setInt(1, emprestimo.getId_exemplar());
-            stmt.setString(2, emprestimo.getData_Emprestimo());
-            stmt.setString(3, emprestimo.getData_Devolução());
+            stmt.setInt(2, emprestimo.getId_exemplar());
+            stmt.setString(3, emprestimo.getData_Emprestimo());
+            stmt.setString(4, emprestimo.getData_Devolução());
 
             stmt.execute();
 
@@ -296,13 +302,12 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    /*
-     * public static void main(String[] args) {
-     * Bibliotecario Bibliotecario = new Bibliotecario(001, "Jujite", null, null,
-     * null);
-     * 
-     * Bibliotecario.cadastrarUsuario("Professor");
-     * }
-     */
+    public static void main(String[] args) {
+        Bibliotecario Bibliotecario = new Bibliotecario(001, "Jujite", null, null,null);
+
+        Bibliotecario.cadastrarEmprestimo(15);
+
+        System.out.println("lets the game beguns");
+    }
 
 }

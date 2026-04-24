@@ -46,13 +46,17 @@ INSERT INTO livro (titulo, autor, ano_lancamento, isbn, id_genero) VALUES
 ('Clean Code', 'Robert C. Martin', 2008, '9788576082675', 15);
 
 
-INSERT INTO exemplar (id_livro, data_aquisicao, status) VALUES 
+INSERT INTO exemplar (ID_LIVRO, aquisição, status) VALUES 
 (1, '2026-04-22', 'DISPONIVEL'), (1, '2026-04-22', 'INDISPONIVEL'), (1, '2026-04-22', 'DISPONIVEL'),
 (2, '2026-04-22', 'DISPONIVEL'), (2, '2026-04-22', 'DISPONIVEL'), (2, '2026-04-22', 'INDISPONIVEL'),
 (3, '2026-04-22', 'DISPONIVEL'), (3, '2026-04-22', 'DISPONIVEL'), (3, '2026-04-22', 'DISPONIVEL'),
 (4, '2026-04-22', 'INDISPONIVEL'), (4, '2026-04-22', 'DISPONIVEL'), (4, '2026-04-22', 'DISPONIVEL'),
-(5, '2026-04-22', 'DISPONIVEL'), (5, '2026-04-22', 'INDISPONIVEL'), (5, '2026-04-22', 'INDISPONIVEL');
-(6, '2026-04-22', 'DISPONIVEL'), (6, '2026-04-22', 'INDISPONIVEL'), (6, '2026-04-22', 'DISPONIVEL'),
+(5, '2026-04-22', 'DISPONIVEL'), (5, '2026-04-22', 'INDISPONIVEL'), (5, '2026-04-22', 'INDISPONIVEL'),
+(6, '2026-04-22', 'DISPONIVEL'), (6, '2026-04-22', 'INDISPONIVEL'), (6, '2026-04-22', 'DISPONIVEL');
+INSERT INTO exemplar (ID_LIVRO, aquisição, status) VALUES 
+(7, '2026-04-22', 'INDISPONIVEL'), (7, '2026-04-22', 'INDISPONIVEL'), (7, '2026-04-22', 'INDISPONIVEL');
 
-
+select ID_EXEMPLAR from exemplar where ID_LIVRO = 6 and status = 'DISPONÍVEL';
 insert into emprestimo (ID_USUARIO, ID_EXEMPLAR, DATA_EMPRESTIMO, DEVOLUÇÃO_DATA) values(?, ?, STR_TO_DATE('?', '%d/%m/%Y'), STR_TO_DATE('?', '%d/%m/%Y'));
+insert into usuarios (NOME, CPF, EMAIL, TELEFONE, TIPO) values ("andrey testes", "12345678909","andrey_testes@email.com", "5547912345678", "aluno");
+

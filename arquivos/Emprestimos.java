@@ -4,16 +4,22 @@ public class Emprestimos {
     private int id_exemplar;
     private String data_Emprestimo;
     private String data_Devolução;
+    private String status;
     
-    public Emprestimos (int id_emprestimo, int id_usuario, int id_exemplar, String data_Emprestimo, String data_Devolução){
+    public Emprestimos (int id_emprestimo, int id_usuario, int id_exemplar, String data_Emprestimo, String data_Devolução, String status){
         this.id_emprestimo = id_emprestimo;
         this.id_usuario = id_usuario;
         this.id_exemplar = id_exemplar;
         this.data_Emprestimo = data_Emprestimo;
         this.data_Devolução = data_Devolução;
+        this.status = status;
     }
 
     //getters e setters;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
     public void setId_exemplar(int id_exemplar){
         this.id_exemplar = id_exemplar;
     }
@@ -54,4 +60,10 @@ public class Emprestimos {
 
         return this.data_Devolução;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    
 }
