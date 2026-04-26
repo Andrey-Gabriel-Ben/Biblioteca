@@ -7,15 +7,15 @@ public class Livro {
     private int id_livro;
     private String titulo;
     private String Autor;
-    private int ano;
-    private int id_genero;
+    private int ano_lançameto;
     private String isbn;
+    private int id_genero;
 
-    protected Livro(int id_livro, String titulo, String Autor, int ano, int id_genero, String isbn) {
+    protected Livro(int id_livro, String titulo, String Autor, int ano_lançameto, int id_genero, String isbn) {
         this.id_livro = id_livro;
         this.titulo = titulo;
         this.Autor = Autor;
-        this.ano = ano;
+        this.ano_lançameto = ano_lançameto;
         this.id_genero = id_genero;
         this.isbn = isbn;
     }
@@ -109,8 +109,8 @@ public class Livro {
         this.Autor = Autor;
     }
 
-    public void setAno(int ano) {
-        this.ano = ano;
+    public void setAno_lançamento(int ano_lançameto) {
+        this.ano_lançameto = ano_lançameto;
     }
 
     public void setId_genero(int id_genero) {
@@ -133,8 +133,8 @@ public class Livro {
         return this.Autor;
     }
 
-    public int getAno() {
-        return this.ano;
+    public int getAno_lançameto() {
+        return this.ano_lançameto;
     }
 
     public int getId_genero() {
@@ -147,4 +147,3 @@ public class Livro {
 
 }
 
-// LIVRO: ID, TITULO, AUTOR, EDITORA, ANO PUBLICAÇÃO, “genero”, EDIÇÃO, ISBN

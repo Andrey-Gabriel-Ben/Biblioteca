@@ -17,6 +17,7 @@ public class Usuario {
         this.cpf = cpf;
         this.email = email;
         this.telefone = telefone;
+        this.tipo = null;
     }
 
     // buscas
@@ -219,8 +220,4 @@ public class Usuario {
         return formatarCpf(this.getCpf());
     }
 
-    // main teste
-
-    public static void main(String[] args) {
-    }
 }

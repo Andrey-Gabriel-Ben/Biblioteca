@@ -7,11 +7,13 @@ public class Genero {
     private int id_genero;
     private String nome;
 
+    //construtor
     public Genero (int id_genero, String nome) {
         this.id_genero = id_genero;
         this.nome = nome;
     }
 
+    //buscas no banco
     protected int  buscarIdPorNome(String genero){
         String select = "SELECT ID_GENERO FROM genero WHERE nome = ?";
         int idEncontrado =  -1; 
@@ -34,21 +36,7 @@ public class Genero {
         
     }
 
-//iniciar utils
-    protected String apenasNumeros(String NumerosSujos){
-        String apenasNumeros = NumerosSujos.replaceAll("[^0-9]", "");
-        return apenasNumeros;
-    }
-
-    protected static boolean  validarEntrada(String entrada){
-        if (entrada == null || entrada.trim().isEmpty()) {
-            System.err.println("O campo não pode estar vazio!");
-            return false;
-        }
-        return true;
-    }
-
-// fim utils
+    //Setters e getters
     public void setId_genero(int id_genero) {
         this.id_genero = id_genero;
     }
@@ -65,18 +53,4 @@ public class Genero {
         return nome;
     }
 
-    public static void main(String[] args) {
-            //genero
-            Genero catLivro = new Genero(0, "Ficção Científica");
-            catLivro.buscarIdPorNome("Ficção Científica");
-            
-            System.out.println(catLivro.getId_genero());
-
-        
-
-    }
-
-
-
 }
-//genero: ID, genero (ARMAZENADA EM UMA LISTA PARA CONSULTA, MAS POSSUIR UM GET E UM SET)

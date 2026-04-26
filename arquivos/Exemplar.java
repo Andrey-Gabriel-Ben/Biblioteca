@@ -8,7 +8,8 @@ public class Exemplar {
     private int id_livro;
     private String aquisição;
     private String Status;
-
+    
+    //construtor
     public Exemplar(int id_exemplar, int id_livro, String aquisição, String Status) {
         this.id_exemplar = id_exemplar;
         this.id_livro = id_livro;
@@ -16,8 +17,9 @@ public class Exemplar {
         this.Status = Status;
     }
 
+    //Metodos para consulta no Banco
     public int buscarIdDisponivelPorIdLivro(int id_livro) {
-        String select = "select ID_EXEMPLAR from exemplar where ID_LIVRO = ? and status = 'DISPONÍVEL';";
+        String select = "select ID_EXEMPLAR from exemplar where ID_LIVRO = ? and status = 'DISPONIVEL';";
         int idEncontrado = -1;
 
         try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
@@ -37,27 +39,6 @@ public class Exemplar {
         }
 
         return idEncontrado;
-    }
-
-    public void alterarStatus(int ID_EXEMPLAR, String Status) {
-        String alter = "update exemplar set status = ? WHERE id_exemplar = ?;";
-
-        try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(alter)) {
-
-            stmt.setString(1, Status);
-            stmt.setInt(2, ID_EXEMPLAR);
-
-            int linhasAfetadas = stmt.executeUpdate();
-
-            if (linhasAfetadas > 0) {
-                System.out.println("Status alterado com sucesso!");
-            } else {
-                System.out.println("Nenhum exemplar encontrado com o ID: " + ID_EXEMPLAR);
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao alterar status do Exemplar: " + e.getMessage());
-        }
-
     }
 
     // getters e stters
@@ -94,10 +75,12 @@ public class Exemplar {
     }
 
     public static void main(String[] args) {
-        Exemplar ex = new Exemplar(0, 0, null, null);
+        
+        Exemplar Exemplar = new Exemplar(0,0,null,null);
 
-        int teste = ex.buscarIdDisponivelPorIdLivro(6);
-        System.out.println(teste);
+        int id = Exemplar.buscarIdDisponivelPorIdLivro(7);
+
+        System.out.println(id);
+
     }
-
 }

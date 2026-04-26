@@ -6,6 +6,7 @@ public class Main {
         } while (true);
     }
     
+    //(Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);) 
 
 
 //main oficial
