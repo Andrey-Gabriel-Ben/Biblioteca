@@ -1,4 +1,4 @@
-public class Main {
+public class ByteBook {
     
     public void exibirInterfaçe(){
         do { 
