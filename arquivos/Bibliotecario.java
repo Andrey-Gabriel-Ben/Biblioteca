@@ -14,10 +14,11 @@ public class Bibliotecario extends Usuario {
     }
 
     // metodos de cadastro E UPLOAD
-    //Cadastro e Upload de Usuarios
-    private boolean cadastrarUsuario(Scanner scanner, String Tipo) {
-        Usuario novoUsuario = new Usuario(0, null, null, null, null);
 
+    //Cadastro e Upload de Usuarios
+    public boolean cadastrarUsuario(Scanner scanner, String Tipo) {
+        Usuario novoUsuario = new Usuario(0, null, null, null, null);
+  
         // nome
         System.out.println("\nDigite o nome do usuario: ");
         String nomeImput = scanner.nextLine();
@@ -102,7 +103,7 @@ public class Bibliotecario extends Usuario {
     }
 
     //Cadastro e Upload de livros
-    private boolean cadastrarlivro(Scanner scanner) {
+    public boolean cadastrarlivro(Scanner scanner) {
         Livro novoLivro = new Livro(0, null, null, 0, 0, null);
 
         // título
@@ -179,7 +180,7 @@ public class Bibliotecario extends Usuario {
     }
 
     //Cadastro e Upload de exemplares
-    private boolean cadastrarExemplar(Scanner scanner) {
+    public boolean cadastrarExemplar(Scanner scanner) {
 
         Exemplar novoExemplar = new Exemplar(-1, -1, null, "Disponivel");
 
@@ -224,7 +225,7 @@ public class Bibliotecario extends Usuario {
     }
 
     //Cadastro e Upload de emprestimos
-    private boolean cadastrarEmprestimo(Scanner scanner, int diasParaDevolver) {
+    public boolean cadastrarEmprestimo(Scanner scanner, int diasParaDevolver) {
 
         Emprestimos nvEmprestimo = new Emprestimos(0, 0, 0, null, null, null, null);
 
@@ -305,7 +306,7 @@ public class Bibliotecario extends Usuario {
 
     //devoluções
 
-    private boolean devolverLivro(Scanner scanner, double multaDiaria){
+    public boolean devolverLivro(Scanner scanner, double multaDiaria){
 
         Emprestimos dv = new Emprestimos(0, 0, 0, null, null, null, null);
 
@@ -369,9 +370,6 @@ public class Bibliotecario extends Usuario {
             System.err.println("\nErro técnico ao salvar: " + e.getMessage());
         }
     }
-
-
-
 
 
     public static void main(String[] args) {
