@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
 public class Bibliotecario extends Usuario {
@@ -306,7 +305,7 @@ public class Bibliotecario extends Usuario {
 
     //devoluções
 
-    private boolean devolverLivro(Scanner scanner){
+    private boolean devolverLivro(Scanner scanner, double multaDiaria){
 
         Emprestimos dv = new Emprestimos(0, 0, 0, null, null, null, null);
 
@@ -323,18 +322,54 @@ public class Bibliotecario extends Usuario {
         dv.setarParaDevolucao(id_usuario, titulo);
         if (dv.getId_emprestimo() <= 0 || dv.getId_exemplar() <= 0 || dv.getData_Devolução() == null){return false;}
 
-        //calculo de multa
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-DD");
+        // calcular multa
+        dv.CalcularMulta(multaDiaria);
 
-        LocalDate hj = LocalDate.now();
-        LocalDate devolução = LocalDate.parse(dv.getData_Devolução(), formatter);
-        Long diasDeAtraso = ChronoUnit.DAYS.between(hj, devolução);
-
-        System.out.println(dv.getData_Devolução());
-        System.out.println(diasDeAtraso);
+        //data de retorno
+        LocalDate hoje = LocalDate.now();
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String hojeTexto = hoje.format(formatador);
+        dv.setData_retorno(hojeTexto);
+        
+        sendReturnToDataBase(dv);
 
         return true;
     }
+
+    public void sendReturnToDataBase(Emprestimos dv){
+        //alterar emprestimo pendente
+        String emprestimo = "UPDATE EMPRESTIMO SET DATA_ENTREGA = TO_DATE(?, 'DD/MM/YY'), STATUS = 'FINALIZADO' WHERE ID_EMPRESTIMO = ?;";
+
+        //Alterar status do exemplar
+        String exemplar = "update exemplar set status = 'DISPONIVEL' WHERE id_exemplar = ?;";
+
+        try (Connection conn = ConexaoBanco.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmt1 = conn.prepareStatement(emprestimo); PreparedStatement stmt2 = conn.prepareStatement(exemplar)) {
+                stmt1.setString(1, dv.getData_retorno());
+                stmt1.setInt(2, dv.getId_emprestimo());
+
+                stmt1.execute();
+
+                stmt2.setInt(1, dv.getId_exemplar());
+                stmt2.execute();
+
+                conn.commit();
+
+                System.out.println("\na devolução foi cadastrada para o banco!");
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+            
+
+        } catch (SQLException e) {
+            System.err.println("\nErro técnico ao salvar: " + e.getMessage());
+        }
+    }
+
 
 
 
@@ -344,7 +379,7 @@ public class Bibliotecario extends Usuario {
         
         Bibliotecario Bibliotecario = new Bibliotecario(001, "Jujite", null, null, null);
 
-        Bibliotecario.devolverLivro(scanner);
+        Bibliotecario.devolverLivro(scanner, 2.50);
 
         System.out.println("lets the game beguns");
     }

@@ -2,6 +2,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class Emprestimos {
     private int id_emprestimo;
@@ -54,6 +56,25 @@ public class Emprestimos {
         setId_exemplar(idExemplar);
         setData_Devolução(data_devolucao);
         
+    }
+
+    //calculo de multa
+    public boolean  CalcularMulta(double multaDiaria){
+        LocalDate hj = LocalDate.now();
+
+        LocalDate devolução = LocalDate.parse(getData_Devolução());
+        Long diasDeAtraso = ChronoUnit.DAYS.between(devolução, hj);
+
+        if (diasDeAtraso > 0) {
+            double multaTotal = diasDeAtraso * multaDiaria;
+            System.out.println("Dias de atraso: " + diasDeAtraso);
+            System.out.println("Valor total da multa: R$ " + multaTotal);
+            return false;
+        }else {
+            System.out.println("Entrega em dia ou adiantada. Sem multa.");
+            return true;
+        }
+
     }
 
     //Setters
