@@ -1,6 +1,6 @@
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,10 +15,23 @@ public class Bibliotecario extends Usuario {
 
     // metodos de cadastro E UPLOAD
 
-    //Cadastro e Upload de Usuarios
-    public boolean cadastrarUsuario(Scanner scanner, String Tipo) {
+    // Cadastro e Upload de Usuarios
+    public boolean cadastrarUsuario(Scanner scanner) {
         Usuario novoUsuario = new Usuario(0, null, null, null, null);
-  
+
+        // tipo
+        System.out.println("Qual o tipo de usuário? (ALUNO, PROFESSOR)");
+        String tipoInformado = scanner.nextLine().toUpperCase().trim();
+        switch (tipoInformado) {
+            case "ALUNO", "PROFESSOR" -> {
+                novoUsuario.setTipo(tipoInformado);
+            }
+            default -> {
+                System.out.println("Tipo de usuário inválido.");
+                return false;
+            }
+        }
+
         // nome
         System.out.println("\nDigite o nome do usuario: ");
         String nomeImput = scanner.nextLine();
@@ -52,9 +65,6 @@ public class Bibliotecario extends Usuario {
         }
         telefoneImput = apenasNumeros(telefoneImput);
         novoUsuario.setTelefone(telefoneImput);
-
-        // tipo
-        novoUsuario.setTipo(Tipo);
 
         sendUserToDatabase(novoUsuario);
 
@@ -102,7 +112,7 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    //Cadastro e Upload de livros
+    // Cadastro e Upload de livros
     public boolean cadastrarlivro(Scanner scanner) {
         Livro novoLivro = new Livro(0, null, null, 0, 0, null);
 
@@ -179,7 +189,7 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    //Cadastro e Upload de exemplares
+    // Cadastro e Upload de exemplares
     public boolean cadastrarExemplar(Scanner scanner) {
 
         Exemplar novoExemplar = new Exemplar(-1, -1, null, "Disponivel");
@@ -224,17 +234,19 @@ public class Bibliotecario extends Usuario {
         }
     }
 
-    //Cadastro e Upload de emprestimos
-    public boolean cadastrarEmprestimo(Scanner scanner, int diasParaDevolver) {
+    // Cadastro e Upload de emprestimos
+    public boolean cadastrarEmprestimo(Scanner scanner) {
 
-        Emprestimos nvEmprestimo = new Emprestimos(0, 0, 0, null, null, null, null);
+        Emprestimos nv = new Emprestimos(0, 0, 0, null, null, null, null);
 
         // id_Usuario
         System.out.println("\nDigite o nome do usuario: ");
         String nomeImput = scanner.nextLine();
         int id_usuario = buscarIdPorNome(nomeImput);
-        if (id_usuario <= 0) {return false;}
-        nvEmprestimo.setId_usuario(id_usuario);
+        if (id_usuario <= 0) {
+            return false;
+        }
+        nv.setId_usuario(id_usuario);
 
         // id_exemplar disponivel
         System.out.println("\nDigite o título do Livro desejado: ");
@@ -243,41 +255,60 @@ public class Bibliotecario extends Usuario {
         int id_livro = lv.buscarIdPorNomeLivro(titulo);
         Exemplar exemplar = new Exemplar(0, 0, null, null);
         int id_exemplar = exemplar.buscarIdDisponivelPorIdLivro(id_livro);
-        if (id_exemplar <= 0) {return false;}
-        nvEmprestimo.setId_exemplar(id_exemplar);
+        if (id_exemplar <= 0) {
+            return false;
+        }
+        nv.setId_exemplar(id_exemplar);
 
         // data emprestimo
         LocalDate hoje = LocalDate.now();
         DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String hojeTexto = hoje.format(formatador);
-        nvEmprestimo.setData_Emprestimo(hojeTexto);
+        nv.setData_Emprestimo(hojeTexto);
 
         // data devolução
+        String type = nv.buscarTipoPorId(nv.getId_usuario());
+        int diasParaDevolver;
+
+        switch (type) {
+            case "ALUNO" -> {
+                diasParaDevolver = 15;
+            }
+
+            case "PROFESSOR", "BIBLIOTECARIO" -> {
+                diasParaDevolver = 30;
+            }
+            default -> {
+                System.err.println("tipo não especificado");
+                System.err.println("ok... isso definitivamente não era para acontecer");
+                return false;
+            }
+        }
         LocalDate devolução = hoje.plusDays(diasParaDevolver);
         String devoluçãoTexto = devolução.format(formatador);
-        nvEmprestimo.setData_Devolução(devoluçãoTexto);
+        nv.setData_Devolução(devoluçãoTexto);
         System.out.println("O livro deverá ser devolvido até dia " + devoluçãoTexto + " caso cotrario será cobrado multa");
 
+        // status
+        nv.setStatus("PENDENTE");
 
-        //status
-        nvEmprestimo.setStatus("PENDENTE");
-
-        sendEmprestimoToDatabase(nvEmprestimo);
+        sendEmprestimoToDatabase(nv);
 
         return true;
     }
 
     private void sendEmprestimoToDatabase(Emprestimos emprestimo) {
-        //registrar novo emprestimo
+        // registrar novo emprestimo
         String insert = "insert into emprestimo (ID_USUARIO, ID_EXEMPLAR, DATA_EMPRESTIMO, DATA_DEVOLUCAO, status) values(?, ?, TO_DATE(?, 'DD/MM/YYYY'), TO_DATE(?, 'DD/MM/YYYY'), ?);";
 
-        //Alterar status do exemplar
+        // Alterar status do exemplar
         String update = "update exemplar set status = 'INDISPONIVEL' WHERE id_exemplar = ?;";
 
         try (Connection conn = ConexaoBanco.getConnection()) {
             conn.setAutoCommit(false);
 
-            try (PreparedStatement stmt1 = conn.prepareStatement(insert); PreparedStatement stmt2 = conn.prepareStatement(update)) {
+            try (PreparedStatement stmt1 = conn.prepareStatement(insert);
+                    PreparedStatement stmt2 = conn.prepareStatement(update)) {
                 stmt1.setInt(1, emprestimo.getId_usuario());
                 stmt1.setInt(2, emprestimo.getId_exemplar());
                 stmt1.setString(3, emprestimo.getData_Emprestimo());
@@ -297,16 +328,15 @@ public class Bibliotecario extends Usuario {
                 conn.rollback();
                 throw e;
             }
-            
 
         } catch (SQLException e) {
             System.err.println("\nErro técnico ao salvar: " + e.getMessage());
         }
     }
 
-    //devoluções
+    // devoluções
 
-    public boolean devolverLivro(Scanner scanner, double multaDiaria){
+    public boolean devolverLivro(Scanner scanner) {
 
         Emprestimos dv = new Emprestimos(0, 0, 0, null, null, null, null);
 
@@ -314,40 +344,45 @@ public class Bibliotecario extends Usuario {
         System.out.println("\nDigite o nome do usuario: ");
         String nomeImput = scanner.nextLine();
         int id_usuario = buscarIdPorNome(nomeImput);
-        if (id_usuario <= 0) {return false;}
+        if (id_usuario <= 0) {
+            return false;
+        }
         dv.setId_usuario(id_usuario);
 
         // id emprestimo, id exemplar e data de devolução
         System.out.println("\nDigite o título do livro a ser devolvido: ");
         String titulo = scanner.nextLine();
         dv.setarParaDevolucao(id_usuario, titulo);
-        if (dv.getId_emprestimo() <= 0 || dv.getId_exemplar() <= 0 || dv.getData_Devolução() == null){return false;}
+        if (dv.getId_emprestimo() <= 0 || dv.getId_exemplar() <= 0 || dv.getData_Devolução() == null) {
+            return false;
+        }
 
         // calcular multa
-        dv.CalcularMulta(multaDiaria);
+        dv.CalcularMulta(dv.getId_usuario());
 
-        //data de retorno
+        // data de retorno
         LocalDate hoje = LocalDate.now();
         DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String hojeTexto = hoje.format(formatador);
         dv.setData_retorno(hojeTexto);
-        
+
         sendReturnToDataBase(dv);
 
         return true;
     }
 
-    public void sendReturnToDataBase(Emprestimos dv){
-        //alterar emprestimo pendente
+    public void sendReturnToDataBase(Emprestimos dv) {
+        // alterar emprestimo pendente
         String emprestimo = "UPDATE EMPRESTIMO SET DATA_ENTREGA = TO_DATE(?, 'DD/MM/YY'), STATUS = 'FINALIZADO' WHERE ID_EMPRESTIMO = ?;";
 
-        //Alterar status do exemplar
+        // Alterar status do exemplar
         String exemplar = "update exemplar set status = 'DISPONIVEL' WHERE id_exemplar = ?;";
 
         try (Connection conn = ConexaoBanco.getConnection()) {
             conn.setAutoCommit(false);
 
-            try (PreparedStatement stmt1 = conn.prepareStatement(emprestimo); PreparedStatement stmt2 = conn.prepareStatement(exemplar)) {
+            try (PreparedStatement stmt1 = conn.prepareStatement(emprestimo);
+                    PreparedStatement stmt2 = conn.prepareStatement(exemplar)) {
                 stmt1.setString(1, dv.getData_retorno());
                 stmt1.setInt(2, dv.getId_emprestimo());
 
@@ -364,22 +399,37 @@ public class Bibliotecario extends Usuario {
                 conn.rollback();
                 throw e;
             }
-            
 
         } catch (SQLException e) {
             System.err.println("\nErro técnico ao salvar: " + e.getMessage());
         }
     }
 
+    // listar livros;
+    public boolean  listarLivrosDisponiveis(Scanner imput) {
+        String select = "SELECT l.titulo, l.autor, COUNT(ex.ID_EXEMPLAR) AS quantidade_disponivel FROM LIVRO l LEFT JOIN EXEMPLAR ex ON l.ID_LIVRO = ex.ID_LIVRO GROUP BY l.ID_LIVRO, l.titulo, l.autor ORDER BY l.titulo;";
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
-        
-        Bibliotecario Bibliotecario = new Bibliotecario(001, "Jujite", null, null, null);
+        try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select); ResultSet rs = stmt.executeQuery()) {
 
-        Bibliotecario.devolverLivro(scanner, 2.50);
+            System.out.println("\n--- ACERVO DISPONÍVEL (ByteBook) ---");
+            System.out.printf("%-45s | %-25s | %-5s%n", "TÍTULO", "AUTOR", "EXEMPLARES DISP.");
+            System.out.println("---------------------------------------------------------------------------------------------");
 
-        System.out.println("lets the game beguns");
+            while (rs.next()) {
+                String titulo = rs.getString("titulo");
+                String autor = rs.getString("autor");
+                int qtd = rs.getInt("quantidade_disponivel");
+
+                System.out.printf("%-45s | %-25s | %-5s%n", titulo, autor, qtd);
+            }
+
+            System.out.println("Aperte ENTER para continuar");
+            imput.nextLine();
+            
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar livros: " + e.getMessage());
+            return false;
+        }
     }
-
 }

@@ -13,9 +13,10 @@ public class Emprestimos {
     private String data_Devolução;
     private String data_retorno;
     private String status;
-    
-    //construtor
-    public Emprestimos (int id_emprestimo, int id_usuario, int id_exemplar, String data_Emprestimo, String data_Devolução, String data_retorno, String status){
+
+    // construtor
+    public Emprestimos(int id_emprestimo, int id_usuario, int id_exemplar, String data_Emprestimo,
+            String data_Devolução, String data_retorno, String status) {
         this.id_emprestimo = id_emprestimo;
         this.id_usuario = id_usuario;
         this.id_exemplar = id_exemplar;
@@ -25,14 +26,14 @@ public class Emprestimos {
         this.status = status;
     }
 
-    //SETERS PARA DEVOLUÇÃO
-    public void setarParaDevolucao (int id_usuario, String titulo){
+    // SETERS PARA DEVOLUÇÃO
+    public void setarParaDevolucao(int id_usuario, String titulo) {
         String select = "select e.ID_EMPRESTIMO, e.ID_EXEMPLAR, E.DATA_DEVOLUCAO from emprestimo e join exemplar ex on ex.ID_EXEMPLAR = e.ID_EXEMPLAR join livro l on l.ID_LIVRO = ex.ID_LIVRO where e.ID_USUARIO = ? and e.STATUS = 'PENDENTE' and l.titulo = ?";
         int idEmprestimo = -1;
         int idExemplar = -1;
         String data_devolucao = null;
 
-        try (Connection conn = ConexaoBanco.getConnection();PreparedStatement stmt = conn.prepareStatement(select)){
+        try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
 
             stmt.setInt(1, id_usuario);
             stmt.setString(2, titulo);
@@ -51,15 +52,56 @@ public class Emprestimos {
             System.err.println("Erro ao buscar dados no banco: " + e.getMessage());
 
         }
-        
+
         setId_emprestimo(idEmprestimo);
         setId_exemplar(idExemplar);
         setData_Devolução(data_devolucao);
-        
+
     }
 
-    //calculo de multa
-    public boolean  CalcularMulta(double multaDiaria){
+    // busca no banco
+    public String buscarTipoPorId(int id_usuario) {
+        String select = "select tipo from usuarios where id_usuario = ?;";
+        String tipo = null;
+
+        try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
+
+            stmt.setInt(1, id_usuario);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    tipo = rs.getString("tipo");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar genero: " + e.getMessage());
+        }
+
+        return tipo;
+
+    }
+
+    // calculo de multa
+    public boolean CalcularMulta(int id_usuario) {
+        String tipo = buscarTipoPorId(id_usuario);
+        double multaDiaria;
+
+        switch (tipo) {
+            case "ALUNO" -> {
+                multaDiaria = 2.5;
+            }
+
+            case "PROFESSOR", "BIBLIOTECARIO" -> {
+                multaDiaria = 4;
+            }
+            default -> {
+                System.err.println("tipo não especificado");
+                System.err.println("ok... isso definitivamente não era para acontecer");
+                return false;
+            }
+        }
+
         LocalDate hj = LocalDate.now();
 
         LocalDate devolução = LocalDate.parse(getData_Devolução());
@@ -70,23 +112,23 @@ public class Emprestimos {
             System.out.println("Dias de atraso: " + diasDeAtraso);
             System.out.println("Valor total da multa: R$ " + multaTotal);
             return false;
-        }else {
+        } else {
             System.out.println("Entrega em dia ou adiantada. Sem multa.");
             return true;
         }
 
     }
 
-    //Setters
+    // Setters
     public void setData_retorno(String data_retorno) {
         this.data_retorno = data_retorno;
     }
-    
+
     public void setStatus(String status) {
         this.status = status;
     }
-    
-    public void setId_exemplar(int id_exemplar){
+
+    public void setId_exemplar(int id_exemplar) {
         this.id_exemplar = id_exemplar;
     }
 
@@ -105,8 +147,8 @@ public class Emprestimos {
     public void setData_Devolução(String data_Devolução) {
         this.data_Devolução = data_Devolução;
     }
-    
-    //Getters
+
+    // Getters
     public int getId_emprestimo() {
         return id_emprestimo;
     }
@@ -135,5 +177,4 @@ public class Emprestimos {
         return status;
     }
 
-    
 }
