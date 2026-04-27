@@ -37,8 +37,9 @@ Para acessar o sistema, basta baixá-lo primeiramente por esse repositório. Par
 
 <p style="font-size: 30px;"> Istrutores do Curso: </p>
 
-
-
+|<img loading="lazy" src="https://avatars.githubusercontent.com/u/65239719?v=4" width=115><br>|<img loading="lazy" src="https://avatars.githubusercontent.com/u/74120112?v=4" width=115><br>|
+| :-: | :-: |
+|[Rodrigo Azevedo da Costa](https://github.com/razevedocosta)|[Vilson Moro](https://github.com/instrutorvilson)|
 #
 
 <p style="font-size: 30px;"> Aluno: </p>
