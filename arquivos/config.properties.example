@@ -1,0 +1,5 @@
+# ByteBook - Exemplo de Configuração
+# Renomeie este arquivo para 'config.properties' e preencha os dados
+db.URL=jdbc:postgresql://SEU_HOST_DO_SUPABASE:5432/postgres
+db.USUARIO=seu_usuario_aqui
+db.SENHA=sua_senha_aqui
