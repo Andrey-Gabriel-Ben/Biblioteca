@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class ByteBook {
 
-    private static void exibirInterfaçe(Scanner scanner, Bibliotecario Gestor) {
+    public static void exibirInterfaçe(Scanner scanner, Bibliotecario Gestor) {
         int opcao;
 
         do {
