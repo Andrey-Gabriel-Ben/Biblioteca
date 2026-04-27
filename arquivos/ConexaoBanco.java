@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -10,22 +11,22 @@ public class ConexaoBanco {
     private static final  Properties props = new Properties();
 
     static {
-        try (FileInputStream fis = new FileInputStream("arquivos/config.properties")) {
+        File arquivoConfig = new File("config.properties");
+
+        try (FileInputStream fis = new FileInputStream(arquivoConfig)) {
             props.load(fis);
         } catch (IOException e) {
-            System.err.println("Erro ao carregar configurações do banco: " + e.getMessage());
-            System.out.println("Professor, verifica se você instalou o arquivo que te mandei no teans e deixou na pasta 'arquivos'");
+            System.err.println("ERRO CRÍTICO: Arquivo 'config.properties' não encontrado na pasta!");
+            System.err.println("Caminho tentado: " + arquivoConfig.getAbsolutePath());
         }
     }
-
-    
 
     public static Connection getConnection() throws SQLException {
 
         try {
             Class.forName(DRIVER);
         } catch (ClassNotFoundException e) {
-            throw new SQLException("Driver JDBC do PostgreSQL não encontrado. Verifique se adicionou o .jar ao projeto.", e);
+            throw new SQLException("Driver JDBC não encontrado! Verifique o arquivo .jar", e);
         }
 
         return DriverManager.getConnection(
@@ -34,8 +35,8 @@ public class ConexaoBanco {
             props.getProperty("db.SENHA")
         );
     }
-
-    public static void main(String[] args) {
+    
+        public static void main(String[] args) {
         System.out.println("--- Iniciando teste de conexão com Supabase ---");
 
         try (Connection conexao = ConexaoBanco.getConnection()) {
@@ -43,6 +44,7 @@ public class ConexaoBanco {
                 System.out.println("SUCESSO: O Java conseguiu falar com o PostgreSQL no Supabase!");
                 System.out.println("Status: Pronto para gerenciar a Biblioteca na nuvem.");
             }
+            
         } catch (SQLException e) {
             System.err.println("FALHA: A conexão falhou!");
             System.err.println("Causa do erro: " + e.getMessage());
