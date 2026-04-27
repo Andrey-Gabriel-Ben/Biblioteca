@@ -24,7 +24,7 @@ public class Bibliotecario extends Usuario {
         String tipoInformado = scanner.nextLine().toUpperCase().trim();
         switch (tipoInformado) {
             case "ALUNO", "PROFESSOR" -> {
-                novoUsuario.setTipo(tipoInformado);
+                novoUsuario.setTipo(tipoInformado.toUpperCase().trim());
             }
             default -> {
                 System.out.println("Tipo de usuário inválido.");
@@ -407,7 +407,7 @@ public class Bibliotecario extends Usuario {
 
     // listar livros;
     public boolean  listarLivrosDisponiveis(Scanner imput) {
-        String select = "SELECT l.titulo, l.autor, COUNT(ex.ID_EXEMPLAR) AS quantidade_disponivel FROM LIVRO l LEFT JOIN EXEMPLAR ex ON l.ID_LIVRO = ex.ID_LIVRO GROUP BY l.ID_LIVRO, l.titulo, l.autor ORDER BY l.titulo;";
+        String select = "SELECT l.titulo, l.autor, COUNT(ex.ID_EXEMPLAR) FILTER (WHERE ex.status = 'DISPONIVEL') AS QUANTIDADE_DISP FROM LIVRO l LEFT JOIN EXEMPLAR ex ON l.ID_LIVRO = ex.ID_LIVRO GROUP BY l.ID_LIVRO, l.titulo, l.autor ORDER BY l.titulo;";
 
         try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select); ResultSet rs = stmt.executeQuery()) {
 
@@ -418,7 +418,7 @@ public class Bibliotecario extends Usuario {
             while (rs.next()) {
                 String titulo = rs.getString("titulo");
                 String autor = rs.getString("autor");
-                int qtd = rs.getInt("quantidade_disponivel");
+                int qtd = rs.getInt("QUANTIDADE_DISP");
 
                 System.out.printf("%-45s | %-25s | %-5s%n", titulo, autor, qtd);
             }
