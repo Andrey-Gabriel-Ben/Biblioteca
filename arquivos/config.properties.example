@@ -1,4 +1,4 @@
 # config.properties
-db.URL=jdbc:postgresql://db.mdllynbfwqulgcmdgzrt.supabase.co:5432/postgres
-db.USUARIO=postgres
-db.SENHA=+xDqbjdN/aJ7!6*
+db.URL=jdbc:postgresql:SEU LINK
+db.USUARIO= SEU USUARIO
+db.SENHA= SUA SENHA

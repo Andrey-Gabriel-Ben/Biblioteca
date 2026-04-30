@@ -21,13 +21,13 @@ public class Usuario {
     }
 
     // buscas
-    protected int buscarIdPorNome(String nome) {
-        String select = "select ID_USUARIO from usuarios where NOME = ?;";
+    protected int buscarIdPorCpf(String cpf) {
+        String select = "select ID_USUARIO from usuarios where cpf = ?;";
         int idEncontrado = -1;
 
         try (Connection conn = ConexaoBanco.getConnection(); PreparedStatement stmt = conn.prepareStatement(select)) {
 
-            stmt.setString(1, nome);
+            stmt.setString(1, cpf);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -218,6 +218,16 @@ public class Usuario {
 
     public String getCpfformatado() {
         return formatarCpf(this.getCpf());
+    }
+
+
+    public static void main(String[] args) {
+        Usuario tst = new Usuario(0, null, null, null, null);
+
+        int id = tst.buscarIdPorCpf("11414322933");
+
+        System.out.println(id);
+
     }
 
 }

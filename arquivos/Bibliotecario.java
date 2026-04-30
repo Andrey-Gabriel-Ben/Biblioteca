@@ -127,9 +127,7 @@ public class Bibliotecario extends Usuario {
         // Autor
         System.out.println("\nDigite o nome do autor do livro: ");
         String autorImput = scanner.nextLine();
-        if (!validarEntrada(autorImput)) {
-            return false;
-        }
+        if (!validarEntrada(autorImput)) {return false;}
         novoLivro.setAutor(autorImput);
 
         // ano_lançamento
@@ -154,6 +152,8 @@ public class Bibliotecario extends Usuario {
             return false;
         }
         novoLivro.setIsbn(isbnImput);
+
+
 
         sendBookToDatabase(novoLivro);
 
@@ -240,9 +240,9 @@ public class Bibliotecario extends Usuario {
         Emprestimos nv = new Emprestimos(0, 0, 0, null, null, null, null);
 
         // id_Usuario
-        System.out.println("\nDigite o nome do usuario: ");
-        String nomeImput = scanner.nextLine();
-        int id_usuario = buscarIdPorNome(nomeImput);
+        System.out.println("\nDigite o cpf do usuario: ");
+        String cpfImput = scanner.nextLine();
+        int id_usuario = buscarIdPorCpf(apenasNumeros(cpfImput));
         if (id_usuario <= 0) {
             return false;
         }
@@ -342,8 +342,8 @@ public class Bibliotecario extends Usuario {
 
         // id_Usuario
         System.out.println("\nDigite o nome do usuario: ");
-        String nomeImput = scanner.nextLine();
-        int id_usuario = buscarIdPorNome(nomeImput);
+        String cpfImput = scanner.nextLine();
+        int id_usuario = buscarIdPorCpf(apenasNumeros(cpfImput));
         if (id_usuario <= 0) {
             return false;
         }
